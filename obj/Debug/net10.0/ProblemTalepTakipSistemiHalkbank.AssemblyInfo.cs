@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProblemTalepTakipSistemiHalkbank")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0576ba87203565b6bb3e5cbad843c4813bfc075f")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProblemTalepTakipSistemiHalkbank")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProblemTalepTakipSistemiHalkbank")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
