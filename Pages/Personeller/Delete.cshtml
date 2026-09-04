@@ -1,0 +1,39 @@
+@page "{id:int}"
+@model ProblemTalepTakipSistemiHalkbank.Pages.Personeller.DeleteModel
+@{
+    ViewData["Title"] = "Personel Sil";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Personel Silme Onayı</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead text-danger">Bu personeli silmek istediğinizden emin misiniz?</p>
+                    <hr />
+                    
+                    <dl class="row">
+                        <dt class="col-sm-4">Ad Soyad:</dt>
+                        <dd class="col-sm-8 fw-bold">@Model.Personel.AdSoyad</dd>
+
+                        <dt class="col-sm-4">Departman:</dt>
+                        <dd class="col-sm-8">@Model.Personel.Departman</dd>
+                    </dl>
+
+                    <form method="post">
+                        <!-- Silinecek Id değerini gizli olarak POST ediyoruz -->
+                        <input type="hidden" asp-for="Personel.Id" />
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-page="./Index" class="btn btn-secondary">Vazgeç</a>
+                            <button type="submit" class="btn btn-danger">Evet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

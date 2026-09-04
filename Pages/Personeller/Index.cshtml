@@ -19,6 +19,7 @@
                 <th>Id</th>
                 <th>Ad Soyad</th>
                 <th>Birim / Departman</th>
+                <th>İşlemler</th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +32,10 @@
                         <td>@personel.AdSoyad</td>
                         <!--departman yerine birim yazılabilir-->
                         <td>@personel.Departman</td>
+                        <td>
+                            <a asp-page="./Edit" asp-route-id="@personel.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                            <a asp-page="./Delete" asp-route-id="@personel.Id" class="btn btn-sm btn-danger ms-1">Sil</a>
+                        </td>
                     </tr>
                 }
             }
