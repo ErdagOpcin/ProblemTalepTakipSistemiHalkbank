@@ -1,0 +1,42 @@
+@page
+@model ProblemTalepTakipSistemiHalkbank.Pages.Personeller.IndexModel
+@{
+    ViewData["Title"] = "Personel Listesi";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Personel Listesi</h2>
+        <a asp-page="Create" class="btn btn-primary">+ Yeni Personel Ekle</a>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Ad Soyad</th>
+                <th>Birim / Departman</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.PersonelListesi != null && Model.PersonelListesi.Any())
+            {
+                @foreach (var personel in Model.PersonelListesi)
+                {
+                    <tr>
+                        <td>@personel.Id</td>
+                        <td>@personel.AdSoyad</td>
+                        <!--departman yerine birim yazılabilir-->
+                        <td>@personel.Departman</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">Henüz kayıtlı personel bulunmamaktadır.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
