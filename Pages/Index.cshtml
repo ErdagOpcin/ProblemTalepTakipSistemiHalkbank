@@ -1,10 +1,29 @@
 ﻿@page
 @model IndexModel
+
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-4">Problem Talep Takip Sistemi</h1>
+
+    @if (Model.GirisYapanPersonel != null)
+    {
+        <div class="mt-4">
+            <h4>Giriş Yapan Personel</h4>
+            <p>
+                <strong>Ad Soyad:</strong> @Model.GirisYapanPersonel.AdSoyad
+            </p>
+            <p>
+                <strong>Departman:</strong> @Model.GirisYapanPersonel.Departman
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="mt-4">
+            <p>Bu kullanıcıya bağlı bir personel kaydı bulunamadı.</p>
+        </div>
+    }
 </div>

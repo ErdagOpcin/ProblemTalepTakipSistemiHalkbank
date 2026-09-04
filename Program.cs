@@ -1,14 +1,18 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-
-using ProblemTalepTakipSistemiHalkbank.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProblemTalepTakipSistemiHalkbank.Data;
+using ProblemTalepTakipSistemiHalkbank.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("DefaultConnection bulunamadı.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("DefaultConnection bulunamadı.");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -20,20 +24,21 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Add services to the container.
-
 builder.Services.AddHttpClient<PasswordLeakService>();
+
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
 });
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Admin ve Personel rollerini oluştur.
+
+// Roller ve test kullanıcıları için başlangıç ayarları
 using (var scope = app.Services.CreateScope())
 {
     var roleManager =
@@ -42,6 +47,11 @@ using (var scope = app.Services.CreateScope())
     var userManager =
         scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
+    var dbContext =
+        scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+
+    // Admin ve Personel rollerini oluştur
     string[] roles = { "Admin", "Personel" };
 
     foreach (var role in roles)
@@ -52,15 +62,37 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Test kullanıcısını Admin yap.
-    var adminUser = await userManager.FindByEmailAsync("test1@example.com");
+
+    // test1@example.com kullanıcısını Admin yap
+    var adminUser =
+        await userManager.FindByEmailAsync("test1@example.com");
 
     if (adminUser != null &&
         !await userManager.IsInRoleAsync(adminUser, "Admin"))
     {
         await userManager.AddToRoleAsync(adminUser, "Admin");
     }
+
+
+    // test3@example.com kullanıcısını Ahmet Yılmaz personeli ile eşleştir
+    var personelUser =
+        await userManager.FindByEmailAsync("test3@example.com");
+
+    if (personelUser != null)
+    {
+        var personel = await dbContext.Personeller
+            .FirstOrDefaultAsync(p => p.AdSoyad == "Ahmet Yılmaz");
+
+        if (personel != null &&
+            string.IsNullOrEmpty(personel.IdentityUserId))
+        {
+            personel.IdentityUserId = personelUser.Id;
+
+            await dbContext.SaveChangesAsync();
+        }
+    }
 }
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -70,16 +102,18 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets()
-   .AllowAnonymous();
+    .AllowAnonymous();
 
 app.MapRazorPages()
-   .WithStaticAssets();
+    .WithStaticAssets();
 
 app.Run();
