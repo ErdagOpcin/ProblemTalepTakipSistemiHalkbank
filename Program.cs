@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,8 @@ using ProblemTalepTakipSistemiHalkbank.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -81,7 +81,9 @@ using (var scope = app.Services.CreateScope())
     if (personelUser != null)
     {
         var personel = await dbContext.Personeller
-            .FirstOrDefaultAsync(p => p.AdSoyad == "Ahmet Yılmaz");
+            .FirstOrDefaultAsync(
+                p => p.AdSoyad == "Ahmet Yılmaz"
+            );
 
         if (personel != null &&
             string.IsNullOrEmpty(personel.IdentityUserId))
@@ -94,7 +96,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
