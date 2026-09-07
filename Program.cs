@@ -24,9 +24,13 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
+// HttpClient servisleri
 builder.Services.AddHttpClient<PasswordLeakService>();
 builder.Services.AddHttpClient<CityApiService>();
 
+
+// Giriş yapmamış kullanıcıların sayfalara erişmesini engelle
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -59,7 +63,9 @@ using (var scope = app.Services.CreateScope())
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            await roleManager.CreateAsync(
+                new IdentityRole(role)
+            );
         }
     }
 
@@ -71,16 +77,31 @@ using (var scope = app.Services.CreateScope())
     if (adminUser != null &&
         !await userManager.IsInRoleAsync(adminUser, "Admin"))
     {
-        await userManager.AddToRoleAsync(adminUser, "Admin");
+        await userManager.AddToRoleAsync(
+            adminUser,
+            "Admin"
+        );
     }
 
 
-    // test3@example.com kullanıcısını Ahmet Yılmaz personeli ile eşleştir
+    // test3@example.com kullanıcısını Personel yap
     var personelUser =
         await userManager.FindByEmailAsync("test3@example.com");
 
     if (personelUser != null)
     {
+        if (!await userManager.IsInRoleAsync(
+                personelUser,
+                "Personel"))
+        {
+            await userManager.AddToRoleAsync(
+                personelUser,
+                "Personel"
+            );
+        }
+
+
+        // test3 kullanıcısını Ahmet Yılmaz personeli ile eşleştir
         var personel = await dbContext.Personeller
             .FirstOrDefaultAsync(
                 p => p.AdSoyad == "Ahmet Yılmaz"
@@ -97,7 +118,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-// Configure the HTTP request pipeline
+// HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
