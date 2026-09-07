@@ -7,10 +7,21 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Personel Listesi</h2>
-        @if (User.IsInRole("Admin"))
-{
-    <a asp-page="Create" class="btn btn-primary">+ Yeni Personel Ekle</a>
-}
+        <a asp-page="Create" class="btn btn-primary">+ Yeni Personel Ekle</a>
+    </div>
+
+    <!-- API'den gelen Türkiye Şehirleri Seçim/Filtre Kutusu -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="sehirSecimi" class="form-label fw-bold">Şehir Seçiniz / Filtrele:</label>
+            <select id="sehirSecimi" class="form-select">
+                <option value="">-- Tüm İller (@Model.Cities.Count İl) --</option>
+                @foreach (var city in Model.Cities)
+                {
+                    <option value="@city.Id">@city.sehirIsmi</option>
+                }
+            </select>
+        </div>
     </div>
 
     <table class="table table-bordered table-striped table-hover">
@@ -42,7 +53,7 @@
             else
             {
                 <tr>
-                    <td colspan="3" class="text-center text-muted">Henüz kayıtlı personel bulunmamaktadır.</td>
+                    <td colspan="4" class="text-center text-muted py-3">Henüz kayıtlı personel bulunmamaktadır.</td>
                 </tr>
             }
         </tbody>

@@ -25,6 +25,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddHttpClient<PasswordLeakService>();
+builder.Services.AddHttpClient<CityApiService>();
 
 builder.Services.AddAuthorization(options =>
 {
