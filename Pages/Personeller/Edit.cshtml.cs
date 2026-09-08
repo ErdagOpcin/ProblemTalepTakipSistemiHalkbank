@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using ProblemTalepTakipSistemiHalkbank.Models;
 
 namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
 {
+    [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -25,7 +27,8 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
                 return NotFound();
             }
 
-            var personel = await _context.Personeller.FirstOrDefaultAsync(m => m.Id == id);
+            var personel = await _context.Personeller
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (personel == null)
             {
@@ -33,6 +36,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             Personel = personel;
+
             return Page();
         }
 
@@ -55,10 +59,8 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
 
             return RedirectToPage("./Index");
@@ -66,7 +68,8 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
 
         private bool PersonelExists(int id)
         {
-            return _context.Personeller.Any(e => e.Id == id);
+            return _context.Personeller
+                .Any(e => e.Id == id);
         }
     }
 }

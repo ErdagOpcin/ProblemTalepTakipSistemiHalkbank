@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using ProblemTalepTakipSistemiHalkbank.Models;
 
 namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
 {
+    [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +20,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
         [BindProperty]
         public Personel Personel { get; set; } = default!;
 
-        // 1. GET İsteği: Onay sayfasını açar, silinecek personeli gösterir
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -26,7 +27,8 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
                 return NotFound();
             }
 
-            var personel = await _context.Personeller.FirstOrDefaultAsync(m => m.Id == id);
+            var personel = await _context.Personeller
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (personel == null)
             {
@@ -34,10 +36,10 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             Personel = personel;
+
             return Page();
         }
 
-        // 2. POST İsteği: Kullanıcı "Sil" butonuna bastığında asıl silme işini yapar
         public async Task<IActionResult> OnPostAsync(int? id)
         {
             if (id == null)
@@ -45,12 +47,15 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
                 return NotFound();
             }
 
-            var personel = await _context.Personeller.FindAsync(id);
+            var personel = await _context.Personeller
+                .FindAsync(id);
 
             if (personel != null)
             {
                 Personel = personel;
+
                 _context.Personeller.Remove(Personel);
+
                 await _context.SaveChangesAsync();
             }
 
