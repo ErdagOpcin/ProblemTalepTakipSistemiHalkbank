@@ -2,82 +2,221 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Giriş Yap";
+    Layout = null;
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
+<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        Giriş Yap - Problem Talep Takip Sistemi
+    </title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+</head>
+
+
+<body class="login-page">
+
+
+    <div class="login-background">
+
+        <div class="login-overlay"></div>
+
+
+        <div class="login-brand-area">
+
+            <img src="~/images/halkbank-logo.jpeg"
+                 asp-append-version="true"
+                 alt="Halkbank"
+                 class="login-halkbank-logo" />
+
+            <div class="login-brand-text">
+
+                <h1>
+                    Problem Talep<br />
+                    Takip Sistemi
+                </h1>
+
+                <p>
+                    Halkbank İç Sistem
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="login-card-wrapper">
+
+            <div class="login-card">
+
+                <div class="login-card-header">
+
+                    <span class="login-small-title">
+                        HOŞ GELDİNİZ
+                    </span>
+
+                    <h2>
+                        Giriş Yap
+                    </h2>
+
                     <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+                        Problem Talep Takip Sistemi'ne
+                        erişmek için hesabınızla giriş yapın.
                     </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+
                 </div>
-            </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+
+
+                <form id="account"
+                      method="post"
+                      class="login-form">
+
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger login-validation"
+                         role="alert">
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
-</div>
 
-@section Scripts {
+
+                    <div class="login-field">
+
+                        <label asp-for="Input.Email"
+                               class="login-label">
+                            E-posta
+                        </label>
+
+                        <input asp-for="Input.Email"
+                               class="form-control login-input"
+                               autocomplete="username"
+                               aria-required="true"
+                               placeholder="ornek@halkbank.com.tr" />
+
+                        <span asp-validation-for="Input.Email"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="login-field">
+
+                        <label asp-for="Input.Password"
+                               class="login-label">
+                            Şifre
+                        </label>
+
+                        <input asp-for="Input.Password"
+                               class="form-control login-input"
+                               autocomplete="current-password"
+                               aria-required="true"
+                               placeholder="Şifrenizi girin" />
+
+                        <span asp-validation-for="Input.Password"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="login-options">
+
+                        <label class="remember-me">
+
+                            <input asp-for="Input.RememberMe"
+                                   class="form-check-input" />
+
+                            <span>
+                                Beni Hatırla
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <button id="login-submit"
+                            type="submit"
+                            class="login-button">
+
+                        Giriş Yap
+
+                    </button>
+
+
+                    <div class="login-register">
+
+                        <span>
+                            Hesabınız yok mu?
+                        </span>
+
+                        <a asp-page="./Register"
+                           asp-route-returnUrl="@Model.ReturnUrl">
+
+                            Kayıt Ol
+
+                        </a>
+
+                    </div>
+
+
+                </form>
+
+
+                <div class="login-card-footer">
+
+                    <span>
+                        Güvenli erişim
+                    </span>
+
+                    <span class="login-footer-dot">
+                        •
+                    </span>
+
+                    <span>
+                        Halkbank
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="login-page-footer">
+
+            © 2026 Halkbank - Problem Talep Takip Sistemi
+
+        </div>
+
+    </div>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
     <partial name="_ValidationScriptsPartial" />
-}
+
+
+</body>
+
+</html>

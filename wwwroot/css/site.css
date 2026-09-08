@@ -1,31 +1,1344 @@
+/* =========================================================
+   GENEL
+   ========================================================= */
+
 html {
-  font-size: 14px;
+    font-size: 14px;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    min-height: 100vh;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: #17324d;
+
+    background:
+        linear-gradient(
+            135deg,
+            #edf4fb 0%,
+            #f7faff 50%,
+            #e9f1fa 100%
+        );
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+
+/* =========================================================
+   ANA UYGULAMA
+   ========================================================= */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.sidebar {
+    width: 255px;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    z-index: 100;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 26px 17px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            180deg,
+            #074b86 0%,
+            #075da8 45%,
+            #043d70 100%
+        );
+
+    box-shadow:
+        5px 0 22px rgba(0, 48, 96, 0.18);
+}
+
+
+/* =========================================================
+   HALKBANK LOGO
+   ========================================================= */
+
+.sidebar-brand {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding:
+        5px 4px 26px 4px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.18);
+}
+
+
+.halkbank-logo {
+    width: 205px;
+
+    max-width: 100%;
+
+    height: auto;
+
+    display: block;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   SIDEBAR MENÜ
+   ========================================================= */
+
+.sidebar-menu {
+    margin-top: 30px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        13px 14px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    color:
+        rgba(255, 255, 255, 0.88);
+
+    font-size: 15px;
+    font-weight: 500;
+
+    transition:
+        background-color 0.20s ease,
+        transform 0.20s ease,
+        color 0.20s ease;
+}
+
+
+.sidebar-link:hover {
+    color: white;
+
+    background:
+        rgba(255, 255, 255, 0.14);
+
+    transform:
+        translateX(3px);
+}
+
+
+.sidebar-icon {
+    width: 24px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   SIDEBAR ALT
+   ========================================================= */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    padding-top: 20px;
+}
+
+
+.sidebar-line {
+    width: 100%;
+    height: 1px;
+
+    margin-bottom: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.18);
+}
+
+
+.sidebar-bottom-title {
+    font-size: 12px;
+
+    color:
+        rgba(255, 255, 255, 0.82);
+
+    margin-bottom: 5px;
+}
+
+
+.sidebar-slogan {
+    font-size: 12px;
+
+    color:
+        rgba(255, 255, 255, 0.58);
+}
+
+
+/* =========================================================
+   SAĞ ANA ALAN
+   ========================================================= */
+
+.main-area {
+    margin-left: 255px;
+
+    width:
+        calc(100% - 255px);
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.topbar {
+    min-height: 78px;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 50;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        10px 34px;
+
+    background:
+        rgba(255, 255, 255, 0.97);
+
+    border-bottom:
+        1px solid #dfe8f1;
+
+    box-shadow:
+        0 3px 12px rgba(0, 48, 96, 0.05);
+}
+
+
+.topbar-left {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.topbar-system-title {
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: #08497f;
+}
+
+
+.topbar-system-subtitle {
+    margin-top: 2px;
+
+    font-size: 11px;
+
+    color: #8293a5;
+}
+
+
+/* =========================================================
+   LOGIN PARTIAL
+   ========================================================= */
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+
+    justify-content: flex-end;
+}
+
+
+.topbar-user ul {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    margin: 0;
+
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.topbar-user li {
+    display: flex;
+
+    align-items: center;
+}
+
+
+.topbar-user .nav-link {
+    color: #17324d !important;
+
+    font-size: 14px;
+
+    text-decoration: none;
+}
+
+
+.topbar-user .nav-link:hover {
+    color: #0067b9 !important;
+}
+
+
+.topbar-user .btn-link {
+    color: #17324d !important;
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+
+.topbar-user form {
+    margin: 0;
+}
+
+
+/* =========================================================
+   SAYFA İÇERİĞİ
+   ========================================================= */
+
+.content-area {
+    flex: 1;
+
+    padding:
+        34px;
+}
+
+
+/* =========================================================
+   ANA BEYAZ KART
+   ========================================================= */
+
+.page-card {
+    width: 100%;
+
+    min-height: calc(100vh - 180px);
+
+    background:
+        rgba(255, 255, 255, 0.98);
+
+    border:
+        1px solid #e3ebf3;
+
+    border-radius: 18px;
+
+    padding:
+        30px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 45, 90, 0.08);
+}
+
+
+.page-card .container {
+    max-width: 100%;
+
+    padding: 0;
+
+    margin: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+
+    border: none;
+}
+
+
+/* =========================================================
+   BAŞLIKLAR
+   ========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    color: #173a5e;
+
+    font-weight: 650;
+}
+
+
+.page-card h1 {
+    margin-bottom: 22px;
+}
+
+
+.page-card h2 {
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   TABLOLAR
+   ========================================================= */
+
+.table {
+    width: 100%;
+
+    margin-top: 20px;
+
+    overflow: hidden;
+
+    border-radius: 11px;
+
+    border-color: #dfe7ef;
+
+    background: white;
+}
+
+
+.table thead th {
+    vertical-align: middle;
+
+    font-weight: 600;
+}
+
+
+.table-dark {
+    --bs-table-bg: #17486f;
+
+    --bs-table-border-color: #285b83;
+}
+
+
+.table-hover tbody tr {
+    transition:
+        background-color 0.15s ease;
+}
+
+
+.table-hover tbody tr:hover {
+    --bs-table-bg: #f3f8fc;
+}
+
+
+/* =========================================================
+   FORMLAR
+   ========================================================= */
+
+.form-label {
+    color: #234662;
+
+    font-weight: 600;
+}
+
+
+.form-control,
+.form-select {
+    min-height: 44px;
+
+    border-radius: 9px;
+
+    border:
+        1px solid #cbd8e5;
+
+    background: white;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0872c9;
+
+    box-shadow:
+        0 0 0 0.20rem rgba(8, 114, 201, 0.13);
+}
+
+
+/* =========================================================
+   BUTONLAR
+   ========================================================= */
+
+.btn {
+    border-radius: 8px;
+
+    font-weight: 500;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.btn:hover {
+    transform:
+        translateY(-1px);
+}
+
+
+.btn-primary {
+    background:
+        linear-gradient(
+            135deg,
+            #0875cf,
+            #005ca8
+        );
+
+    border-color: #0066b6;
+
+    box-shadow:
+        0 4px 10px rgba(0, 101, 181, 0.16);
+}
+
+
+.btn-primary:hover {
+    background:
+        linear-gradient(
+            135deg,
+            #0068bb,
+            #004f91
+        );
+
+    border-color: #00589f;
+}
+
+
+.btn-warning {
+    border-radius: 8px;
+
+    box-shadow:
+        0 3px 8px rgba(255, 193, 7, 0.12);
+}
+
+
+.btn-danger {
+    border-radius: 8px;
+
+    box-shadow:
+        0 3px 8px rgba(220, 53, 69, 0.12);
+}
+
+
+/* =========================================================
+   ANA SAYFA
+   ========================================================= */
+
+.text-center {
+    position: relative;
+}
+
+
+.display-4 {
+    color: #163b5d;
+
+    font-weight: 500;
+
+    letter-spacing: -1px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.app-footer {
+    min-height: 60px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0 34px;
+
+    color: #708397;
+
+    font-size: 12px;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border-top:
+        1px solid #dfe8f1;
+}
+
+
+/* =========================================================
+   ANA UYGULAMA RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 82px;
+
+        padding:
+            24px 10px;
+    }
+
+
+    .sidebar-brand {
+        padding-left: 0;
+
+        padding-right: 0;
+    }
+
+
+    .halkbank-logo {
+        width: 60px;
+    }
+
+
+    .sidebar-link {
+        justify-content: center;
+
+        padding:
+            13px 8px;
+    }
+
+
+    .sidebar-link span:not(.sidebar-icon) {
+        display: none;
+    }
+
+
+    .sidebar-bottom {
+        display: none;
+    }
+
+
+    .main-area {
+        margin-left: 82px;
+
+        width:
+            calc(100% - 82px);
+    }
+
+
+    .content-area {
+        padding:
+            18px;
+    }
+
+
+    .page-card {
+        padding:
+            20px;
+
+        border-radius: 13px;
+    }
+
+
+    .topbar {
+        padding:
+            10px 20px;
+    }
+
+
+    .topbar-system-title {
+        font-size: 16px;
+    }
+
+
+    .topbar-system-subtitle {
+        display: none;
+    }
+
+
+    .app-footer {
+        padding:
+            12px 20px;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 4px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .topbar {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 8px;
+
+        padding:
+            15px 20px;
+    }
+
+
+    .topbar-user ul {
+        flex-wrap: wrap;
+    }
+
+
+    .content-area {
+        padding:
+            12px;
+    }
+
+
+    .page-card {
+        padding:
+            16px;
+    }
+}
+
+
+/* =========================================================
+   LOGIN SAYFASI
+   ========================================================= */
+
+.login-page {
+    margin: 0;
+    padding: 0;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    background: #063e70;
+}
+
+
+/* =========================================================
+   LOGIN ARKA PLAN
+   ========================================================= */
+
+.login-background {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    padding:
+        60px 8%;
+
+    background-image:
+        url("/images/halkbank-building.jpeg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+}
+
+
+.login-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(2, 31, 59, 0.88) 0%,
+            rgba(4, 55, 98, 0.66) 42%,
+            rgba(4, 38, 69, 0.35) 100%
+        );
+}
+
+
+/* =========================================================
+   LOGIN SOL MARKA ALANI
+   ========================================================= */
+
+.login-brand-area {
+    position: absolute;
+
+    z-index: 2;
+
+    left: 7%;
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    width: 430px;
+}
+
+
+.login-halkbank-logo {
+    width: 280px;
+
+    max-width: 100%;
+
+    height: auto;
+
+    display: block;
+
+    margin-bottom: 32px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.20);
+}
+
+
+.login-brand-text h1 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 49px;
+
+    line-height: 1.08;
+
+    font-weight: 700;
+
+    letter-spacing: -1.2px;
+
+    text-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.30);
+}
+
+
+.login-brand-text p {
+    margin-top: 17px;
+
+    color:
+        rgba(255, 255, 255, 0.78);
+
+    font-size: 17px;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   LOGIN KART WRAPPER
+   ========================================================= */
+
+.login-card-wrapper {
+    position: relative;
+
+    z-index: 3;
+
+    width: 100%;
+
+    max-width: 445px;
+}
+
+
+/* =========================================================
+   LOGIN KART
+   ========================================================= */
+
+.login-card {
+    width: 100%;
+
+    padding:
+        43px 42px 29px 42px;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.60);
+
+    border-radius: 21px;
+
+    box-shadow:
+        0 28px 75px rgba(0, 20, 40, 0.34);
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+}
+
+
+/* =========================================================
+   LOGIN KART BAŞLIK
+   ========================================================= */
+
+.login-card-header {
+    margin-bottom: 30px;
+}
+
+
+.login-small-title {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #0871bd;
+
+    font-size: 11px;
+
+    font-weight: 750;
+
+    letter-spacing: 1.7px;
+}
+
+
+.login-card-header h2 {
+    margin:
+        0 0 9px 0;
+
+    color: #163b5d;
+
+    font-size: 32px;
+
+    font-weight: 700;
+}
+
+
+.login-card-header p {
+    margin: 0;
+
+    max-width: 340px;
+
+    color: #718699;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LOGIN FORM
+   ========================================================= */
+
+.login-form {
+    width: 100%;
+}
+
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+
+.login-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #294962;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.login-input {
+    width: 100%;
+
+    height: 51px;
+
+    padding:
+        0 15px;
+
+    border:
+        1px solid #c9d8e5;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #17324d;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.20s ease,
+        box-shadow 0.20s ease,
+        background-color 0.20s ease;
+}
+
+
+.login-input::placeholder {
+    color: #a5b2be;
+}
+
+
+.login-input:focus {
+    background: white;
+
+    border-color: #0874c9;
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 4px rgba(8, 116, 201, 0.11);
+}
+
+
+/* =========================================================
+   BENİ HATIRLA
+   ========================================================= */
+
+.login-options {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin:
+        3px 0 23px 0;
+}
+
+
+.remember-me {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 0;
+
+    cursor: pointer;
+
+    color: #667d91;
+
+    font-size: 13px;
+}
+
+
+.remember-me .form-check-input {
+    margin: 0;
+
+    cursor: pointer;
+}
+
+
+.remember-me .form-check-input:checked {
+    background-color: #0871bd;
+
+    border-color: #0871bd;
+}
+
+
+/* =========================================================
+   LOGIN BUTONU
+   ========================================================= */
+
+.login-button {
+    width: 100%;
+
+    height: 51px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #087bd3,
+            #00589e
+        );
+
+    font-size: 15px;
+
+    font-weight: 650;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 7px 18px rgba(0, 96, 171, 0.25);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+
+.login-button:hover {
+    transform:
+        translateY(-1px);
+
+    background:
+        linear-gradient(
+            135deg,
+            #006fc2,
+            #004d8b
+        );
+
+    box-shadow:
+        0 11px 25px rgba(0, 86, 155, 0.30);
+}
+
+
+.login-button:active {
+    transform:
+        translateY(0);
+}
+
+
+/* =========================================================
+   LOGIN KAYIT
+   ========================================================= */
+
+.login-register {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    margin-top: 23px;
+
+    color: #74879a;
+
+    font-size: 13px;
+}
+
+
+.login-register a {
+    color: #0871bd;
+
+    font-weight: 650;
+
+    text-decoration: none;
+}
+
+
+.login-register a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   LOGIN VALIDATION
+   ========================================================= */
+
+.login-validation {
+    margin-bottom: 15px;
+
+    font-size: 13px;
+}
+
+
+.login-field .text-danger {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   LOGIN KART ALT
+   ========================================================= */
+
+.login-card-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    margin-top: 28px;
+
+    padding-top: 20px;
+
+    border-top:
+        1px solid #e5edf4;
+
+    color: #94a3b1;
+
+    font-size: 11px;
+}
+
+
+.login-footer-dot {
+    color: #b7c2cb;
+}
+
+
+/* =========================================================
+   LOGIN SAYFA ALT
+   ========================================================= */
+
+.login-page-footer {
+    position: absolute;
+
+    z-index: 3;
+
+    left: 7%;
+
+    bottom: 24px;
+
+    color:
+        rgba(255, 255, 255, 0.64);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   LOGIN RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .login-brand-area {
+        width: 330px;
+
+        left: 5%;
+    }
+
+
+    .login-brand-text h1 {
+        font-size: 40px;
+    }
+
+
+    .login-halkbank-logo {
+        width: 230px;
+    }
+
+
+    .login-background {
+        padding:
+            50px 5%;
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .login-background {
+        justify-content: center;
+
+        padding:
+            40px 20px 60px 20px;
+
+        background-position: center;
+    }
+
+
+    .login-brand-area {
+        display: none;
+    }
+
+
+    .login-card-wrapper {
+        max-width: 440px;
+    }
+
+
+    .login-page-footer {
+        left: 50%;
+
+        transform:
+            translateX(-50%);
+
+        width: 100%;
+
+        text-align: center;
+
+        bottom: 14px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .login-card {
+        padding:
+            32px 24px 25px 24px;
+
+        border-radius: 16px;
+    }
+
+
+    .login-card-header h2 {
+        font-size: 27px;
+    }
+
+
+    .login-background {
+        padding:
+            25px 14px 55px 14px;
+    }
 }
