@@ -1,0 +1,154 @@
+@page
+@model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.IndexModel
+
+@{
+    ViewData["Title"] = "Problem Listesi";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h2>
+            Problem Takip Listesi
+        </h2>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-page="Create"
+               class="btn btn-primary">
+
+                + Yeni Problem Ekle
+
+            </a>
+        }
+
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body p-0">
+
+            <table class="table table-striped table-hover mb-0">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>
+                            Tarih
+                        </th>
+
+                        <th>
+                            Başlık
+                        </th>
+
+                        <th>
+                            Şehir
+                        </th>
+
+                        <th>
+                            Öncelik
+                        </th>
+
+                        <th>
+                            Durum
+                        </th>
+
+                        <th>
+                            Atanan Personel
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model.Problemler != null &&
+                         Model.Problemler.Any())
+                    {
+
+                        @foreach (var item in Model.Problemler)
+                        {
+
+                            <tr>
+
+                                <td>
+                                    @item.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")
+                                </td>
+
+
+                                <td>
+                                    <strong>
+                                        @item.Baslik
+                                    </strong>
+                                </td>
+
+
+                                <td>
+                                    @item.Sehir
+                                </td>
+
+
+                                <td>
+
+                                    <span class="badge bg-secondary">
+                                        @item.Oncelik
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="badge bg-info text-dark">
+                                        @item.Durum
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    @(
+                                        item.Personel != null
+                                            ? item.Personel.AdSoyad
+                                            : "Atanmadı"
+                                    )
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+
+                    else
+                    {
+
+                        <tr>
+
+                            <td colspan="6"
+                                class="text-center py-3 text-muted">
+
+                                Kayıtlı problem bulunamadı.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

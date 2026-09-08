@@ -10,8 +10,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Data
             : base(options)
         {
         }
-
-        public DbSet<Problem> Problems { get; set; }
         public DbSet<Personel> Personeller { get; set; }
+        public DbSet<Problem> Problemler { get; set; }
     }
 }
