@@ -6,76 +6,303 @@
 }
 
 <div class="container mt-4">
+
     <div class="card shadow-sm">
+
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Yeni Problem Kaydı</h4>
+
+            <h4 class="mb-0">
+                Yeni Problem Kaydı
+            </h4>
+
         </div>
+
+
         <div class="card-body">
+
             <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <!-- 1. Başlık Alanı -->
-                <div class="mb-3">
-                    <label asp-for="Problem.Baslik" class="form-label font-weight-bold">Problem Başlığı</label>
-                    <input asp-for="Problem.Baslik" class="form-control" placeholder="Örn: ATM Para Sıkışması" />
-                    <span asp-validation-for="Problem.Baslik" class="text-danger"></span>
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
                 </div>
 
-                <!-- 2. Detay Alanı -->
+
                 <div class="mb-3">
-                    <label asp-for="Problem.Aciklama" class="form-label font-weight-bold">Açıklama / Detay</label>
-                    <textarea asp-for="Problem.Aciklama" class="form-control" rows="4" placeholder="Problemin detaylarını açıklayınız..."></textarea>
-                    <span asp-validation-for="Problem.Aciklama" class="text-danger"></span>
+
+                    <label asp-for="Problem.Baslik"
+                           class="form-label fw-bold">
+                        Problem Başlığı
+                    </label>
+
+                    <input asp-for="Problem.Baslik"
+                           class="form-control"
+                           placeholder="Örn: ATM Para Sıkışması" />
+
+                    <span asp-validation-for="Problem.Baslik"
+                          class="text-danger">
+                    </span>
+
                 </div>
 
-                <!-- 3. Bildiren ve Birim Alanları (Yan yana iki kolon) -->
+
+                <div class="mb-3">
+
+                    <label asp-for="Problem.Aciklama"
+                           class="form-label fw-bold">
+                        Açıklama / Detay
+                    </label>
+
+                    <textarea asp-for="Problem.Aciklama"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Problemin detaylarını açıklayınız...">
+                    </textarea>
+
+                    <span asp-validation-for="Problem.Aciklama"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
                 <div class="row">
+
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Problem.KimdenGeldi" class="form-label">Bildiren Kişi / Müşteri</label>
-                        <input asp-for="Problem.KimdenGeldi" class="form-control" placeholder="Örn: Şube Müdürü / Müşteri Adı" />
-                        <span asp-validation-for="Problem.KimdenGeldi" class="text-danger"></span>
+
+                        <label asp-for="Problem.KimdenGeldi"
+                               class="form-label">
+                            Bildiren Kişi / Müşteri
+                        </label>
+
+                        <input asp-for="Problem.KimdenGeldi"
+                               class="form-control"
+                               placeholder="Örn: Şube Müdürü / Müşteri Adı" />
+
                     </div>
+
+
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Problem.Birim" class="form-label">İlgili Birim / Şube</label>
-                        <input asp-for="Problem.Birim" class="form-control" placeholder="Örn: Kadıköy Şubesi" />
-                        <span asp-validation-for="Problem.Birim" class="text-danger"></span>
+
+                        <label asp-for="Problem.Birim"
+                               class="form-label">
+                            İlgili Birim / Şube
+                        </label>
+
+                        <input asp-for="Problem.Birim"
+                               class="form-control"
+                               placeholder="Örn: Kadıköy Şubesi" />
+
                     </div>
+
                 </div>
-                <!-- 4. Şehir Seçimi (API) ve Personel Seçimi (SQL) -->
+
+
+                <!-- Şehir ve İlçe -->
                 <div class="row">
+
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Problem.Sehir" class="form-label font-weight-bold">Şehir</label>
-                        <select asp-for="Problem.Sehir" asp-items="Model.SehirlerListesi" class="form-select">
-                            <option value="">-- Şehir Seçiniz --</option>
+
+                        <label asp-for="SelectedSehirId"
+                               class="form-label fw-bold">
+                            Şehir
+                        </label>
+
+                        <select asp-for="SelectedSehirId"
+                                asp-items="Model.SehirlerListesi"
+                                id="sehirSelect"
+                                class="form-select">
+
+                            <option value="">
+                                -- Şehir Seçiniz --
+                            </option>
+
                         </select>
-                        <span asp-validation-for="Problem.Sehir" class="text-danger"></span>
+
                     </div>
+
+
                     <div class="col-md-6 mb-3">
-                        <label asp-for="Problem.PersonelId" class="form-label font-weight-bold">Atanan Personel</label>
-                        <select asp-for="Problem.PersonelId" asp-items="Model.PersonelListesi" class="form-select">
-                            <option value="">-- Personel Seçiniz --</option>
+
+                        <label asp-for="Problem.Ilce"
+                               class="form-label fw-bold">
+                            İlçe
+                        </label>
+
+                        <select asp-for="Problem.Ilce"
+                                asp-items="Model.IlcelerListesi"
+                                id="ilceSelect"
+                                class="form-select">
+
+                            <option value="">
+                                -- Önce Şehir Seçiniz --
+                            </option>
+
                         </select>
-                        <span asp-validation-for="Problem.PersonelId" class="text-danger"></span>
+
+                        <span asp-validation-for="Problem.Ilce"
+                              class="text-danger">
+                        </span>
+
                     </div>
+
                 </div>
 
-                <!-- 5. Öncelik Seçimi (Enum) -->
-                <div class="mb-3">
-                    <label asp-for="Problem.Oncelik" class="form-label font-weight-bold">Öncelik Derecesi</label>
-                    <select asp-for="Problem.Oncelik" asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik>()" class="form-select"></select>
-                    <span asp-validation-for="Problem.Oncelik" class="text-danger"></span>
+
+                <!-- Personel ve Öncelik -->
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="Problem.PersonelId"
+                               class="form-label fw-bold">
+                            Atanan Personel
+                        </label>
+
+                        <select asp-for="Problem.PersonelId"
+                                asp-items="Model.PersonelListesi"
+                                class="form-select">
+
+                            <option value="">
+                                -- Personel Seçiniz --
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Problem.PersonelId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="Problem.Oncelik"
+                               class="form-label fw-bold">
+                            Öncelik Derecesi
+                        </label>
+
+                        <select asp-for="Problem.Oncelik"
+                                asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik>()"
+                                class="form-select">
+                        </select>
+
+                    </div>
+
                 </div>
 
-                <!-- 6. Kaydet ve Geri Dön Butonları -->
+
                 <div class="d-flex justify-content-between mt-4">
-                    <a asp-page="./Index" class="btn btn-outline-secondary">Vazgeç / Listeye Dön</a>
-                    <button type="submit" class="btn btn-primary px-4">Problemi Kaydet</button>
+
+                    <a asp-page="./Index"
+                       class="btn btn-outline-secondary">
+
+                        Vazgeç / Listeye Dön
+
+                    </a>
+
+
+                    <button type="submit"
+                            class="btn btn-primary px-4">
+
+                        Problemi Kaydet
+
+                    </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
+
 </div>
 
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+    }
+
+    <script>
+
+        const sehirSelect =
+            document.getElementById("sehirSelect");
+
+        const ilceSelect =
+            document.getElementById("ilceSelect");
+
+
+        sehirSelect.addEventListener(
+            "change",
+            async function () {
+
+                const sehirId = this.value;
+
+
+                ilceSelect.innerHTML =
+                    '<option value="">-- İlçe Seçiniz --</option>';
+
+
+                if (!sehirId) {
+
+                    ilceSelect.innerHTML =
+                        '<option value="">-- Önce Şehir Seçiniz --</option>';
+
+                    return;
+                }
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            `?handler=Ilceler&sehirId=${sehirId}`
+                        );
+
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "İlçeler alınamadı."
+                        );
+                    }
+
+
+                    const ilceler =
+                        await response.json();
+
+
+                    ilceler.forEach(function (ilce) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value =
+                            ilce.name;
+
+                        option.textContent =
+                            ilce.name;
+
+                        ilceSelect.appendChild(option);
+
+                    });
+
+                }
+                catch (error) {
+
+                    console.error(error);
+
+                    ilceSelect.innerHTML =
+                        '<option value="">İlçeler yüklenemedi</option>';
+
+                }
+
+            }
+        );
+
+    </script>
 }

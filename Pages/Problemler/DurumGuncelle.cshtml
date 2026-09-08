@@ -1,0 +1,79 @@
+@page
+@model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.DurumGuncelleModel
+
+@{
+    ViewData["Title"] = "Durum Güncelle";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Problem Durumunu Güncelle</h2>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden"
+                       asp-for="Problem.Id" />
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Problem
+                    </label>
+
+                    <input class="form-control"
+                           value="@Model.Problem.Baslik"
+                           disabled />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Atanan Personel
+                    </label>
+
+                    <input class="form-control"
+                           value="@(Model.Problem.Personel?.AdSoyad ?? "Atanmadı")"
+                           disabled />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Problem.Durum"
+                           class="form-label fw-bold">
+                        Durum
+                    </label>
+
+                    <select asp-for="Problem.Durum"
+                            asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu>()"
+                            class="form-select">
+                    </select>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Durumu Kaydet
+
+                </button>
+
+                <a asp-page="./Index"
+                   class="btn btn-secondary ms-2">
+
+                    Geri Dön
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

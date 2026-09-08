@@ -9,21 +9,42 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <h2>
-            Problem Takip Listesi
-        </h2>
+        <h2>Problem Takip Listesi</h2>
 
         @if (User.IsInRole("Admin"))
         {
             <a asp-page="Create"
                class="btn btn-primary">
-
                 + Yeni Problem Ekle
-
             </a>
         }
 
     </div>
+
+
+    <form method="get" class="row mb-3">
+
+        <div class="col-md-4">
+
+            <label asp-for="DurumFiltre"
+                   class="form-label fw-bold">
+                Duruma Göre Filtrele:
+            </label>
+
+            <select asp-for="DurumFiltre"
+                    asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu>()"
+                    class="form-select"
+                    onchange="this.form.submit()">
+
+                <option value="">
+                    -- Tüm Durumlar --
+                </option>
+
+            </select>
+
+        </div>
+
+    </form>
 
 
     <div class="card shadow-sm">
@@ -36,29 +57,17 @@
 
                     <tr>
 
-                        <th>
-                            Tarih
-                        </th>
+                        <th>Tarih</th>
+                        <th>Başlık</th>
+                        <th>Şehir</th>
+                        <th>Öncelik</th>
+                        <th>Durum</th>
+                        <th>Atanan Personel</th>
 
-                        <th>
-                            Başlık
-                        </th>
-
-                        <th>
-                            Şehir
-                        </th>
-
-                        <th>
-                            Öncelik
-                        </th>
-
-                        <th>
-                            Durum
-                        </th>
-
-                        <th>
-                            Atanan Personel
-                        </th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th>İşlemler</th>
+                        }
 
                     </tr>
 
@@ -73,74 +82,101 @@
 
                         @foreach (var item in Model.Problemler)
                         {
+                            var durumYazi = item.Durum switch
+                            {
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Bekliyor
+                                    => "Bekliyor",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.IslemeAlindi
+                                    => "İşleme Alındı",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Cozuldu
+                                    => "Çözüldü",
+
+                                _ => item.Durum.ToString()
+                            };
+
+                            var oncelikYazi = item.Oncelik switch
+                            {
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Dusuk
+                                    => "Düşük",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Orta
+                                    => "Orta",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Yuksek
+                                    => "Yüksek",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Kritik
+                                    => "Kritik",
+
+                                _ => item.Oncelik.ToString()
+                            };
 
                             <tr>
 
                                 <td>
-                                    @item.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")
+                                    @(item.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm"))
                                 </td>
-
 
                                 <td>
-                                    <strong>
-                                        @item.Baslik
-                                    </strong>
+                                    <strong>@item.Baslik</strong>
                                 </td>
-
 
                                 <td>
                                     @item.Sehir
                                 </td>
 
-
                                 <td>
-
                                     <span class="badge bg-secondary">
-                                        @item.Oncelik
+                                        @oncelikYazi
                                     </span>
-
                                 </td>
 
-
                                 <td>
-
                                     <span class="badge bg-info text-dark">
-                                        @item.Durum
+                                        @durumYazi
                                     </span>
-
                                 </td>
-
 
                                 <td>
-
-                                    @(
-                                        item.Personel != null
-                                            ? item.Personel.AdSoyad
-                                            : "Atanmadı"
-                                    )
-
+                                    @(item.Personel != null
+                                        ? item.Personel.AdSoyad
+                                        : "Atanmadı")
                                 </td>
+
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td>
+
+                                        <a asp-page="./DurumGuncelle"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-warning">
+
+                                            Durum Güncelle
+
+                                        </a>
+
+                                    </td>
+                                }
 
                             </tr>
-
                         }
 
                     }
-
                     else
                     {
-
                         <tr>
 
-                            <td colspan="6"
+                            <td colspan="@(User.IsInRole("Admin") ? 7 : 6)"
                                 class="text-center py-3 text-muted">
 
-                                Kayıtlı problem bulunamadı.
+                                Bu filtreye uygun problem bulunamadı.
 
                             </td>
 
                         </tr>
-
                     }
 
                 </tbody>

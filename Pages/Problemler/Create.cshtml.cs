@@ -15,6 +15,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
         private readonly ApplicationDbContext _context;
         private readonly CityApiService _cityApiService;
 
+
         public CreateModel(
             ApplicationDbContext context,
             CityApiService cityApiService)
@@ -25,13 +26,23 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
 
 
         [BindProperty]
-        public Problem Problem { get; set; } = default!;
+        public Problem Problem { get; set; } = new();
 
 
-        public List<SelectListItem> SehirlerListesi { get; set; } = new();
+        [BindProperty]
+        public int? SelectedSehirId { get; set; }
 
 
-        public List<SelectListItem> PersonelListesi { get; set; } = new();
+        public List<SelectListItem> SehirlerListesi { get; set; }
+            = new();
+
+
+        public List<SelectListItem> IlcelerListesi { get; set; }
+            = new();
+
+
+        public List<SelectListItem> PersonelListesi { get; set; }
+            = new();
 
 
         public async Task<IActionResult> OnGetAsync()
@@ -42,8 +53,50 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
         }
 
 
+        // Şehir değiştiğinde JavaScript bu metodu çağıracak.
+        public async Task<JsonResult> OnGetIlcelerAsync(
+            int sehirId)
+        {
+            var ilceler =
+                await _cityApiService.GetDistrictsAsync(sehirId);
+
+            var sonuc = ilceler
+                .Select(i => new
+                {
+                    id = i.Id,
+                    name = i.ilceIsmi
+                })
+                .ToList();
+
+            return new JsonResult(sonuc);
+        }
+
+
         public async Task<IActionResult> OnPostAsync()
         {
+            // Seçilen şehir ID'sinden şehir adını bul.
+            if (SelectedSehirId.HasValue)
+            {
+                var sehirler =
+                    await _cityApiService.GetCitiesAsync();
+
+                var secilenSehir =
+                    sehirler.FirstOrDefault(
+                        s => s.Id == SelectedSehirId.Value
+                    );
+
+                if (secilenSehir != null)
+                {
+                    Problem.Sehir =
+                        secilenSehir.sehirIsmi;
+
+                    // Şehir değeri POST sırasında sonradan
+                    // atandığı için eski doğrulama hatasını temizle.
+                    ModelState.Remove("Problem.Sehir");
+                }
+            }
+
+
             if (!ModelState.IsValid)
             {
                 await DropdownListeleriniDoldur();
@@ -52,7 +105,12 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             }
 
 
-            Problem.OlusturulmaTarihi = DateTime.Now;
+            Problem.OlusturulmaTarihi =
+                DateTime.Now;
+
+
+            Problem.Durum =
+                ProblemDurumu.Bekliyor;
 
 
             _context.Problemler.Add(Problem);
@@ -75,9 +133,29 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                 .Select(s => new SelectListItem
                 {
                     Text = s.sehirIsmi,
-                    Value = s.sehirIsmi
+                    Value = s.Id.ToString()
                 })
                 .ToList();
+
+
+            // Form doğrulama hatasıyla geri döndüyse
+            // seçilmiş şehrin ilçelerini tekrar getir.
+            if (SelectedSehirId.HasValue)
+            {
+                var ilceler =
+                    await _cityApiService.GetDistrictsAsync(
+                        SelectedSehirId.Value
+                    );
+
+
+                IlcelerListesi = ilceler
+                    .Select(i => new SelectListItem
+                    {
+                        Text = i.ilceIsmi,
+                        Value = i.ilceIsmi
+                    })
+                    .ToList();
+            }
 
 
             var personeller =
@@ -89,8 +167,11 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             PersonelListesi = personeller
                 .Select(p => new SelectListItem
                 {
-                    Text = $"{p.AdSoyad} - {p.Departman}",
-                    Value = p.Id.ToString()
+                    Text =
+                        $"{p.AdSoyad} - {p.Departman}",
+
+                    Value =
+                        p.Id.ToString()
                 })
                 .ToList();
         }

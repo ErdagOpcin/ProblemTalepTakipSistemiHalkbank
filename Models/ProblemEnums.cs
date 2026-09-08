@@ -1,17 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ProblemTalepTakipSistemiHalkbank.Models
 {
     public enum ProblemDurumu
     {
-        Acik=1,
-        Islemde=2,
-        Cozuldu=3,
-        Iptal=4
+        [Display(Name = "Bekliyor")]
+        Bekliyor = 1,
+
+        [Display(Name = "İşleme Alındı")]
+        IslemeAlindi = 2,
+
+        [Display(Name = "Çözüldü")]
+        Cozuldu = 3
     }
+
     public enum ProblemOncelik
     {
-        Dusuk=1,
-        Orta=2,
-        Yuksek=3,
-        Kritik=4
+        [Display(Name = "Düşük")]
+        Dusuk = 1,
+
+        [Display(Name = "Orta")]
+        Orta = 2,
+
+        [Display(Name = "Yüksek")]
+        Yuksek = 3,
+
+        [Display(Name = "Kritik")]
+        Kritik = 4
     }
 }
