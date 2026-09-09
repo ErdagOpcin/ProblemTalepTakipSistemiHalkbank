@@ -20,6 +20,8 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
         [BindProperty]
         public Personel Personel { get; set; } = default!;
 
+        public string? HataMesaji { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -28,7 +30,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             var personel = await _context.Personeller
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (personel == null)
             {
@@ -48,16 +50,37 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             var personel = await _context.Personeller
-                .FindAsync(id);
+                .Include(p => p.Problemler)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (personel != null)
+            if (personel == null)
             {
-                Personel = personel;
-
-                _context.Personeller.Remove(Personel);
-
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            Personel = personel;
+
+            // Bir Identity kullanıcısına bağlı personel silinemez.
+            if (!string.IsNullOrWhiteSpace(personel.IdentityUserId))
+            {
+                HataMesaji =
+                    "Bu personel bir kullanıcı hesabına bağlı olduğu için silinemez.";
+
+                return Page();
+            }
+
+            // Üzerinde atanmış problem olan personel silinemez.
+            if (personel.Problemler.Any())
+            {
+                HataMesaji =
+                    "Bu personele atanmış problemler bulunduğu için silinemez.";
+
+                return Page();
+            }
+
+            _context.Personeller.Remove(personel);
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }
