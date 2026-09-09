@@ -13,21 +13,18 @@
 
         @if (User.IsInRole("Admin"))
         {
-            <a asp-page="Create"
-               class="btn btn-primary">
+            <a asp-page="Create" class="btn btn-primary">
                 + Yeni Problem Ekle
             </a>
         }
 
     </div>
 
-
     <form method="get" class="row mb-3">
 
         <div class="col-md-4">
 
-            <label asp-for="DurumFiltre"
-                   class="form-label fw-bold">
+            <label asp-for="DurumFiltre" class="form-label fw-bold">
                 Duruma Göre Filtrele:
             </label>
 
@@ -36,16 +33,13 @@
                     class="form-select"
                     onchange="this.form.submit()">
 
-                <option value="">
-                    -- Tüm Durumlar --
-                </option>
+                <option value="">-- Tüm Durumlar --</option>
 
             </select>
 
         </div>
 
     </form>
-
 
     <div class="card shadow-sm">
 
@@ -56,30 +50,26 @@
                 <thead class="table-dark">
 
                     <tr>
-
                         <th>Tarih</th>
                         <th>Başlık</th>
                         <th>Şehir</th>
                         <th>Öncelik</th>
                         <th>Durum</th>
+                        <th>Çözülme Tarihi</th>
                         <th>Atanan Personel</th>
 
                         @if (User.IsInRole("Admin"))
                         {
                             <th>İşlemler</th>
                         }
-
                     </tr>
 
                 </thead>
 
-
                 <tbody>
 
-                    @if (Model.Problemler != null &&
-                         Model.Problemler.Any())
+                    @if (Model.Problemler != null && Model.Problemler.Any())
                     {
-
                         @foreach (var item in Model.Problemler)
                         {
                             var durumYazi = item.Durum switch
@@ -94,6 +84,20 @@
                                     => "Çözüldü",
 
                                 _ => item.Durum.ToString()
+                            };
+
+                            var durumRenk = item.Durum switch
+                            {
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Bekliyor
+                                    => "bg-warning text-dark",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.IslemeAlindi
+                                    => "bg-primary",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Cozuldu
+                                    => "bg-success",
+
+                                _ => "bg-secondary"
                             };
 
                             var oncelikYazi = item.Oncelik switch
@@ -113,6 +117,23 @@
                                 _ => item.Oncelik.ToString()
                             };
 
+                            var oncelikRenk = item.Oncelik switch
+                            {
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Dusuk
+                                    => "bg-success",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Orta
+                                    => "bg-primary",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Yuksek
+                                    => "bg-warning text-dark",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Kritik
+                                    => "bg-danger",
+
+                                _ => "bg-secondary"
+                            };
+
                             <tr>
 
                                 <td>
@@ -128,15 +149,26 @@
                                 </td>
 
                                 <td>
-                                    <span class="badge bg-secondary">
+                                    <span class="badge @oncelikRenk">
                                         @oncelikYazi
                                     </span>
                                 </td>
 
                                 <td>
-                                    <span class="badge bg-info text-dark">
+                                    <span class="badge @durumRenk">
                                         @durumYazi
                                     </span>
+                                </td>
+
+                                <td>
+                                    @if (item.CozulmeTarihi.HasValue)
+                                    {
+                                        @(item.CozulmeTarihi.Value.ToString("dd.MM.yyyy HH:mm"))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
                                 </td>
 
                                 <td>
@@ -145,37 +177,29 @@
                                         : "Atanmadı")
                                 </td>
 
-
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <td>
-
                                         <a asp-page="./DurumGuncelle"
                                            asp-route-id="@item.Id"
                                            class="btn btn-sm btn-warning">
-
                                             Durum Güncelle
-
                                         </a>
-
                                     </td>
                                 }
 
                             </tr>
                         }
-
                     }
                     else
                     {
                         <tr>
-
-                            <td colspan="@(User.IsInRole("Admin") ? 7 : 6)"
+                            <td colspan="@(User.IsInRole("Admin") ? 8 : 7)"
                                 class="text-center py-3 text-muted">
 
                                 Bu filtreye uygun problem bulunamadı.
 
                             </td>
-
                         </tr>
                     }
 

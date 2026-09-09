@@ -41,8 +41,14 @@ namespace ProblemTalepTakipSistemiHalkbank.Models
             = ProblemDurumu.Bekliyor;
 
 
+        // Problem sisteme eklendiği anda otomatik oluşur.
         public DateTime OlusturulmaTarihi { get; set; }
             = DateTime.Now;
+
+
+        // Problem "Çözüldü" durumuna geçtiği anda
+        // sistem tarafından otomatik doldurulur.
+        public DateTime? CozulmeTarihi { get; set; }
 
 
         [Required(
