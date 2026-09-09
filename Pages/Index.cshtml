@@ -5,25 +5,1313 @@
     ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center mt-5">
-    <h1 class="display-4">Problem Talep Takip Sistemi</h1>
+<style>
 
-    @if (Model.GirisYapanPersonel != null)
-    {
-        <div class="mt-4">
-            <h4>Giriş Yapan Personel</h4>
-            <p>
-                <strong>Ad Soyad:</strong> @Model.GirisYapanPersonel.AdSoyad
-            </p>
-            <p>
-                <strong>Departman:</strong> @Model.GirisYapanPersonel.Departman
-            </p>
-        </div>
+    /* =====================================================
+       DASHBOARD SAYFASI
+       ===================================================== */
+
+    .page-card:has(.hb-dashboard) {
+        padding: 22px !important;
+        background: #f5f8fb !important;
     }
-    else
-    {
-        <div class="mt-4">
-            <p>Bu kullanıcıya bağlı bir personel kaydı bulunamadı.</p>
-        </div>
+
+    .hb-dashboard {
+        width: 100%;
     }
+
+
+    /* =====================================================
+       HERO / HALKBANK BİNA ALANI
+       ===================================================== */
+
+    .hb-hero {
+        position: relative;
+        overflow: hidden;
+
+        min-height: 210px;
+
+        display: flex;
+        align-items: center;
+
+        padding: 38px 42px;
+        margin-bottom: 22px;
+
+        border-radius: 17px;
+
+        background:
+            linear-gradient(
+                90deg,
+                rgba(3, 50, 88, 0.97) 0%,
+                rgba(3, 84, 135, 0.88) 42%,
+                rgba(1, 102, 158, 0.55) 70%,
+                rgba(0, 105, 160, 0.25) 100%
+            ),
+            url('/images/halkbank-building.jpeg');
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        box-shadow:
+            0 12px 30px rgba(0, 67, 113, 0.20);
+    }
+
+
+    .hb-hero-content {
+        position: relative;
+        z-index: 5;
+
+        max-width: 650px;
+    }
+
+
+    .hb-hero-small {
+        margin-bottom: 8px;
+
+        color: rgba(255,255,255,0.80);
+
+        font-size: 11px;
+        font-weight: 700;
+
+        letter-spacing: 1.6px;
+    }
+
+
+    .hb-hero h1 {
+        margin: 0 0 11px !important;
+
+        color: white !important;
+
+        font-size: 34px !important;
+        font-weight: 750 !important;
+
+        letter-spacing: -0.6px;
+    }
+
+
+    .hb-hero p {
+        max-width: 560px;
+
+        margin: 0;
+
+        color: rgba(255,255,255,0.90);
+
+        font-size: 14px;
+
+        line-height: 1.6;
+    }
+
+
+    /* Turuncu dekoratif çizgiler */
+
+    .hb-orange-decoration {
+        position: absolute;
+
+        top: -35px;
+        right: -20px;
+
+        width: 210px;
+        height: 220px;
+
+        z-index: 2;
+
+        pointer-events: none;
+    }
+
+
+    .hb-orange-decoration span {
+        position: absolute;
+
+        width: 14px;
+        height: 175px;
+
+        display: block;
+
+        border-radius: 30px;
+
+        background: #f58220;
+
+        transform: rotate(42deg);
+    }
+
+
+    .hb-orange-decoration span:nth-child(1) {
+        top: -10px;
+        right: 30px;
+
+        opacity: 0.95;
+    }
+
+
+    .hb-orange-decoration span:nth-child(2) {
+        top: 32px;
+        right: 76px;
+
+        opacity: 0.60;
+    }
+
+
+    .hb-orange-decoration span:nth-child(3) {
+        top: 74px;
+        right: 122px;
+
+        opacity: 0.28;
+    }
+
+
+    /* =====================================================
+       İSTATİSTİKLER
+       ===================================================== */
+
+    .hb-stats {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+
+        gap: 17px;
+
+        margin-bottom: 22px;
+    }
+
+
+    .hb-stat-card {
+        position: relative;
+
+        min-height: 108px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 15px;
+
+        padding: 19px;
+
+        overflow: hidden;
+
+        background: white;
+
+        border:
+            1px solid #e2eaf1;
+
+        border-radius: 14px;
+
+        box-shadow:
+            0 5px 18px rgba(24, 57, 83, 0.07);
+    }
+
+
+    .hb-stat-card::after {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        height: 3px;
+    }
+
+
+    .hb-total::after {
+        background: #0877bd;
+    }
+
+
+    .hb-waiting::after {
+        background: #f58220;
+    }
+
+
+    .hb-progress::after {
+        background: #367fd0;
+    }
+
+
+    .hb-solved::after {
+        background: #28a163;
+    }
+
+
+    .hb-stat-icon {
+        width: 48px;
+        height: 48px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        font-size: 20px;
+    }
+
+
+    .hb-total .hb-stat-icon {
+        color: #0877bd;
+
+        background: #e9f5fb;
+    }
+
+
+    .hb-waiting .hb-stat-icon {
+        color: #db7816;
+
+        background: #fff1e1;
+    }
+
+
+    .hb-progress .hb-stat-icon {
+        color: #367fd0;
+
+        background: #eaf2fd;
+    }
+
+
+    .hb-solved .hb-stat-icon {
+        color: #238b55;
+
+        background: #e8f6ee;
+    }
+
+
+    .hb-stat-label {
+        display: block;
+
+        margin-bottom: 3px;
+
+        color: #768795;
+
+        font-size: 12px;
+
+        font-weight: 600;
+    }
+
+
+    .hb-stat-number {
+        display: block;
+
+        color: #173a5e;
+
+        font-size: 29px;
+
+        font-weight: 750;
+
+        line-height: 1;
+    }
+
+
+    /* =====================================================
+       ALT YAPI
+       ===================================================== */
+
+    .hb-main-grid {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1.9fr)
+            minmax(290px, 0.72fr);
+
+        gap: 20px;
+
+        align-items: start;
+    }
+
+
+    .hb-right-column {
+        display: grid;
+
+        gap: 20px;
+    }
+
+
+    .hb-panel {
+        overflow: hidden;
+
+        background: white;
+
+        border:
+            1px solid #e2eaf1;
+
+        border-radius: 14px;
+
+        box-shadow:
+            0 5px 18px rgba(24, 57, 83, 0.06);
+    }
+
+
+    .hb-panel-header {
+        min-height: 70px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 15px;
+
+        padding: 17px 20px;
+
+        border-bottom:
+            1px solid #e9eef3;
+    }
+
+
+    .hb-panel-header h3 {
+        margin: 0 !important;
+
+        color: #173a5e;
+
+        font-size: 17px;
+
+        font-weight: 700;
+    }
+
+
+    .hb-panel-header p {
+        margin: 3px 0 0;
+
+        color: #8c9aa5;
+
+        font-size: 11px;
+    }
+
+
+    .hb-see-all {
+        flex-shrink: 0;
+
+        color: #0875bd;
+
+        font-size: 12px;
+
+        font-weight: 650;
+
+        text-decoration: none;
+    }
+
+
+    .hb-see-all:hover {
+        color: #f58220;
+    }
+
+
+    /* =====================================================
+       TABLO
+       ===================================================== */
+
+    .hb-table {
+        width: 100%;
+
+        margin: 0 !important;
+
+        border-collapse: collapse;
+    }
+
+
+    .hb-table thead th {
+        padding: 13px 16px;
+
+        background: #f5f8fa;
+
+        color: #778894;
+
+        border: none;
+
+        font-size: 10px;
+
+        font-weight: 750;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.5px;
+    }
+
+
+    .hb-table tbody td {
+        padding: 14px 16px;
+
+        color: #344e5e;
+
+        border-bottom:
+            1px solid #edf1f4;
+
+        font-size: 12px;
+
+        vertical-align: middle;
+    }
+
+
+    .hb-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+
+    .hb-problem-name {
+        margin-bottom: 3px;
+
+        color: #173a5e;
+
+        font-size: 13px;
+
+        font-weight: 700;
+    }
+
+
+    .hb-date {
+        color: #95a2ac;
+
+        font-size: 10px;
+    }
+
+
+    /* =====================================================
+       BADGE
+       ===================================================== */
+
+    .hb-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        padding: 5px 9px;
+
+        border-radius: 50px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+
+    .hb-badge-waiting {
+        color: #a75d08;
+
+        background: #fff0d8;
+    }
+
+
+    .hb-badge-progress {
+        color: #1767af;
+
+        background: #e4f0fd;
+    }
+
+
+    .hb-badge-solved {
+        color: #197646;
+
+        background: #e3f4ea;
+    }
+
+
+    .hb-badge-low {
+        color: #197646;
+
+        background: #e3f4ea;
+    }
+
+
+    .hb-badge-medium {
+        color: #1767af;
+
+        background: #e4f0fd;
+    }
+
+
+    .hb-badge-high {
+        color: #a75d08;
+
+        background: #fff0d8;
+    }
+
+
+    .hb-badge-critical {
+        color: #b42f38;
+
+        background: #fde7e8;
+    }
+
+
+    /* =====================================================
+       HIZLI İŞLEMLER
+       ===================================================== */
+
+    .hb-actions {
+        padding: 8px 13px 13px;
+    }
+
+
+    .hb-action {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 12px 9px;
+
+        color: #2b4859;
+
+        border-bottom:
+            1px solid #edf1f4;
+
+        text-decoration: none;
+
+        transition:
+            background 0.15s ease,
+            transform 0.15s ease;
+    }
+
+
+    .hb-action:last-child {
+        border-bottom: none;
+    }
+
+
+    .hb-action:hover {
+        color: #0875bd;
+
+        background: #f6f9fb;
+
+        transform: translateX(2px);
+    }
+
+
+    .hb-action-icon {
+        width: 39px;
+        height: 39px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        color: #0875bd;
+
+        background: #e9f4fb;
+
+        font-size: 17px;
+
+        font-weight: 700;
+    }
+
+
+    .hb-action-orange .hb-action-icon {
+        color: #df7813;
+
+        background: #fff0df;
+    }
+
+
+    .hb-action strong {
+        display: block;
+
+        font-size: 12px;
+    }
+
+
+    .hb-action small {
+        display: block;
+
+        margin-top: 2px;
+
+        color: #8f9da8;
+
+        font-size: 10px;
+    }
+
+
+    /* =====================================================
+       DURUM ÖZETİ
+       ===================================================== */
+
+    .hb-status-list {
+        padding: 10px 20px 15px;
+    }
+
+
+    .hb-status-item {
+        display: grid;
+
+        grid-template-columns:
+            10px 1fr auto;
+
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 11px 0;
+
+        color: #526977;
+
+        border-bottom:
+            1px solid #edf1f4;
+
+        font-size: 12px;
+    }
+
+
+    .hb-status-item:last-child {
+        border-bottom: none;
+    }
+
+
+    .hb-status-item strong {
+        color: #173a5e;
+
+        font-size: 14px;
+    }
+
+
+    .hb-dot {
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+    }
+
+
+    .hb-dot-orange {
+        background: #f58220;
+    }
+
+
+    .hb-dot-blue {
+        background: #367fd0;
+    }
+
+
+    .hb-dot-green {
+        background: #28a163;
+    }
+
+
+    .hb-empty {
+        padding: 45px 20px;
+
+        color: #8c9ba6;
+
+        text-align: center;
+
+        font-size: 13px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @@media (max-width: 1150px) {
+
+        .hb-stats {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+
+        .hb-main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    @@media (max-width: 650px) {
+
+        .hb-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .hb-hero {
+            min-height: 180px;
+
+            padding: 26px;
+        }
+
+        .hb-hero h1 {
+            font-size: 25px !important;
+        }
+    }
+
+</style>
+
+
+<div class="hb-dashboard">
+
+
+    <!-- ===================================================
+         HERO
+         =================================================== -->
+
+    <section class="hb-hero">
+
+        <div class="hb-hero-content">
+
+            <div class="hb-hero-small">
+                PROBLEM TALEP TAKİP SİSTEMİ
+            </div>
+
+
+            @if (User.IsInRole("Admin"))
+            {
+                <h1>
+                    Hoş geldiniz, Admin
+                </h1>
+
+                <p>
+                    Problem ve taleplerin genel durumunu,
+                    son kayıtları ve sistem hareketlerini
+                    tek ekrandan takip edebilirsiniz.
+                </p>
+            }
+            else if (Model.GirisYapanPersonel != null)
+            {
+                <h1>
+                    Hoş geldiniz,
+                    @Model.GirisYapanPersonel.AdSoyad
+                </h1>
+
+                <p>
+                    Size atanmış problem ve taleplerin
+                    güncel durumunu tek ekrandan takip edebilirsiniz.
+                </p>
+            }
+            else
+            {
+                <h1>
+                    Hoş geldiniz
+                </h1>
+
+                <p>
+                    Problem Talep Takip Sistemi
+                </p>
+            }
+
+        </div>
+
+
+        <div class="hb-orange-decoration">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         İSTATİSTİKLER
+         =================================================== -->
+
+    <section class="hb-stats">
+
+
+        <div class="hb-stat-card hb-total">
+
+            <div class="hb-stat-icon">
+                ▦
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Toplam Problem
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.ToplamProblem
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hb-stat-card hb-waiting">
+
+            <div class="hb-stat-icon">
+                ◷
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Bekleyen
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.BekleyenProblem
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hb-stat-card hb-progress">
+
+            <div class="hb-stat-icon">
+                ↻
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    İşleme Alındı
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.IslemdeProblem
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hb-stat-card hb-solved">
+
+            <div class="hb-stat-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Çözülen
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.CozulenProblem
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         ALT ALAN
+         =================================================== -->
+
+    <section class="hb-main-grid">
+
+
+        <!-- SOL - SON PROBLEMLER -->
+
+        <div class="hb-panel">
+
+
+            <div class="hb-panel-header">
+
+                <div>
+
+                    <h3>
+                        Son Problemler
+                    </h3>
+
+                    <p>
+                        En son oluşturulan problem kayıtları
+                    </p>
+
+                </div>
+
+
+                <a asp-page="/Problemler/Index"
+                   class="hb-see-all">
+
+                    Tümünü Gör →
+
+                </a>
+
+            </div>
+
+
+
+            @if (Model.SonProblemler.Any())
+            {
+
+                <div style="overflow-x:auto;">
+
+                    <table class="hb-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Problem
+                                </th>
+
+                                <th>
+                                    Öncelik
+                                </th>
+
+                                <th>
+                                    Durum
+                                </th>
+
+                                <th>
+                                    Personel
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            @foreach (var problem in Model.SonProblemler)
+                            {
+
+                                var durumYazi = problem.Durum switch
+                                {
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Bekliyor
+                                        => "Bekliyor",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.IslemeAlindi
+                                        => "İşleme Alındı",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Cozuldu
+                                        => "Çözüldü",
+
+                                    _ => problem.Durum.ToString()
+                                };
+
+
+                                var durumClass = problem.Durum switch
+                                {
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Bekliyor
+                                        => "hb-badge hb-badge-waiting",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.IslemeAlindi
+                                        => "hb-badge hb-badge-progress",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu.Cozuldu
+                                        => "hb-badge hb-badge-solved",
+
+                                    _ => "hb-badge"
+                                };
+
+
+                                var oncelikYazi = problem.Oncelik switch
+                                {
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Dusuk
+                                        => "Düşük",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Orta
+                                        => "Orta",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Yuksek
+                                        => "Yüksek",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Kritik
+                                        => "Kritik",
+
+                                    _ => problem.Oncelik.ToString()
+                                };
+
+
+                                var oncelikClass = problem.Oncelik switch
+                                {
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Dusuk
+                                        => "hb-badge hb-badge-low",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Orta
+                                        => "hb-badge hb-badge-medium",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Yuksek
+                                        => "hb-badge hb-badge-high",
+
+                                    ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik.Kritik
+                                        => "hb-badge hb-badge-critical",
+
+                                    _ => "hb-badge"
+                                };
+
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="hb-problem-name">
+
+                                            @problem.Baslik
+
+                                        </div>
+
+
+                                        <span class="hb-date">
+
+                                            @problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="@oncelikClass">
+
+                                            @oncelikYazi
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="@durumClass">
+
+                                            @durumYazi
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @(problem.Personel != null
+                                            ? problem.Personel.AdSoyad
+                                            : "Atanmadı")
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            }
+            else
+            {
+
+                <div class="hb-empty">
+
+                    Henüz görüntülenecek problem bulunmuyor.
+
+                </div>
+
+            }
+
+        </div>
+
+
+
+        <!-- ===================================================
+             SAĞ TARAF
+             =================================================== -->
+
+        <div class="hb-right-column">
+
+
+            <!-- HIZLI İŞLEMLER -->
+
+            <div class="hb-panel">
+
+
+                <div class="hb-panel-header">
+
+                    <div>
+
+                        <h3>
+                            Hızlı İşlemler
+                        </h3>
+
+                        <p>
+                            Sık kullanılan işlemler
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hb-actions">
+
+
+                    @if (User.IsInRole("Admin"))
+                    {
+
+                        <a asp-page="/Problemler/Create"
+                           class="hb-action hb-action-orange">
+
+                            <span class="hb-action-icon">
+                                +
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Yeni Problem
+                                </strong>
+
+                                <small>
+                                    Yeni problem kaydı oluştur
+                                </small>
+
+                            </div>
+
+                        </a>
+
+
+
+                        <a asp-page="/Personeller/Create"
+                           class="hb-action">
+
+                            <span class="hb-action-icon">
+                                ♙
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Yeni Personel
+                                </strong>
+
+                                <small>
+                                    Sisteme personel ekle
+                                </small>
+
+                            </div>
+
+                        </a>
+
+                    }
+
+
+                    <a asp-page="/Problemler/Index"
+                       class="hb-action">
+
+                        <span class="hb-action-icon">
+                            ☰
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Problem Listesi
+                            </strong>
+
+                            <small>
+                                Problem kayıtlarını görüntüle
+                            </small>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DURUM DAĞILIMI -->
+
+            <div class="hb-panel">
+
+
+                <div class="hb-panel-header">
+
+                    <div>
+
+                        <h3>
+                            Problem Durum Dağılımı
+                        </h3>
+
+                        <p>
+                            Güncel sistem özeti
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hb-status-list">
+
+
+                    <div class="hb-status-item">
+
+                        <span class="hb-dot hb-dot-orange">
+                        </span>
+
+                        <span>
+                            Bekleyen
+                        </span>
+
+                        <strong>
+                            @Model.BekleyenProblem
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="hb-status-item">
+
+                        <span class="hb-dot hb-dot-blue">
+                        </span>
+
+                        <span>
+                            İşleme Alındı
+                        </span>
+
+                        <strong>
+                            @Model.IslemdeProblem
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="hb-status-item">
+
+                        <span class="hb-dot hb-dot-green">
+                        </span>
+
+                        <span>
+                            Çözülen
+                        </span>
+
+                        <strong>
+                            @Model.CozulenProblem
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>
