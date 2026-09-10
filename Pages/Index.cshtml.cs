@@ -19,22 +19,15 @@ public class IndexModel : PageModel
         _userManager = userManager;
     }
 
-
     public Personel? GirisYapanPersonel { get; set; }
 
-
     public int ToplamProblem { get; set; }
-
     public int BekleyenProblem { get; set; }
-
     public int IslemdeProblem { get; set; }
-
     public int CozulenProblem { get; set; }
-
 
     public List<Problem> SonProblemler { get; set; }
         = new List<Problem>();
-
 
     public async Task OnGetAsync()
     {
@@ -45,45 +38,38 @@ public class IndexModel : PageModel
             return;
         }
 
-
         GirisYapanPersonel = await _context.Personeller
             .FirstOrDefaultAsync(
                 p => p.IdentityUserId == user.Id
             );
 
-
+        // Problem ve atanmış personelleri birlikte getir
         IQueryable<Problem> query = _context.Problemler
-            .Include(p => p.Personel);
+            .Include(p => p.ProblemPersoneller)
+                .ThenInclude(pp => pp.Personel);
 
-
-        // Personel sadece kendisine atanmış
-        // problemlerin istatistiklerini görür.
+        // Personel sadece kendisinin görevlendirildiği
+        // problemlerin istatistiklerini görür (Admin hepsini görür).
         if (!User.IsInRole("Admin"))
         {
             query = query.Where(p =>
-                p.Personel != null &&
-                p.Personel.IdentityUserId == user.Id
+                p.ProblemPersoneller.Any(pp => pp.Personel.IdentityUserId == user.Id)
             );
         }
 
-
         ToplamProblem = await query.CountAsync();
-
 
         BekleyenProblem = await query.CountAsync(
             p => p.Durum == ProblemDurumu.Bekliyor
         );
 
-
         IslemdeProblem = await query.CountAsync(
             p => p.Durum == ProblemDurumu.IslemeAlindi
         );
 
-
         CozulenProblem = await query.CountAsync(
             p => p.Durum == ProblemDurumu.Cozuldu
         );
-
 
         SonProblemler = await query
             .OrderByDescending(p => p.OlusturulmaTarihi)

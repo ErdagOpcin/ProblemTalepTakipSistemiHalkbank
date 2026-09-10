@@ -15,7 +15,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
         private readonly ApplicationDbContext _context;
         private readonly CityApiService _cityApiService;
 
-
         public CreateModel(
             ApplicationDbContext context,
             CityApiService cityApiService)
@@ -24,41 +23,29 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             _cityApiService = cityApiService;
         }
 
-
         [BindProperty]
         public Problem Problem { get; set; } = new();
-
 
         [BindProperty]
         public int? SelectedSehirId { get; set; }
 
+        // Formdan seçilen çoklu personel ID'leri
+        [BindProperty]
+        public List<int> SecilenPersonelIds { get; set; } = new();
 
-        public List<SelectListItem> SehirlerListesi { get; set; }
-            = new();
-
-
-        public List<SelectListItem> IlcelerListesi { get; set; }
-            = new();
-
-
-        public List<SelectListItem> PersonelListesi { get; set; }
-            = new();
-
+        public List<SelectListItem> SehirlerListesi { get; set; } = new();
+        public List<SelectListItem> IlcelerListesi { get; set; } = new();
+        public List<SelectListItem> PersonelListesi { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
             await DropdownListeleriniDoldur();
-
             return Page();
         }
 
-
-        // Şehir değiştiğinde JavaScript bu metodu çağıracak.
-        public async Task<JsonResult> OnGetIlcelerAsync(
-            int sehirId)
+        public async Task<JsonResult> OnGetIlcelerAsync(int sehirId)
         {
-            var ilceler =
-                await _cityApiService.GetDistrictsAsync(sehirId);
+            var ilceler = await _cityApiService.GetDistrictsAsync(sehirId);
 
             var sonuc = ilceler
                 .Select(i => new
@@ -71,63 +58,53 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             return new JsonResult(sonuc);
         }
 
-
         public async Task<IActionResult> OnPostAsync()
         {
-            // Seçilen şehir ID'sinden şehir adını bul.
             if (SelectedSehirId.HasValue)
             {
-                var sehirler =
-                    await _cityApiService.GetCitiesAsync();
-
-                var secilenSehir =
-                    sehirler.FirstOrDefault(
-                        s => s.Id == SelectedSehirId.Value
-                    );
+                var sehirler = await _cityApiService.GetCitiesAsync();
+                var secilenSehir = sehirler.FirstOrDefault(s => s.Id == SelectedSehirId.Value);
 
                 if (secilenSehir != null)
                 {
-                    Problem.Sehir =
-                        secilenSehir.sehirIsmi;
-
-                    // Şehir değeri POST sırasında sonradan
-                    // atandığı için eski doğrulama hatasını temizle.
+                    Problem.Sehir = secilenSehir.sehirIsmi;
                     ModelState.Remove("Problem.Sehir");
                 }
             }
 
+            // Formdan doğrudan doldurulmayan navigasyon özelliğinin doğrulamasını kaldır
+            ModelState.Remove("Problem.ProblemPersoneller");
 
             if (!ModelState.IsValid)
             {
                 await DropdownListeleriniDoldur();
-
                 return Page();
             }
 
+            Problem.OlusturulmaTarihi = DateTime.Now;
+            Problem.Durum = ProblemDurumu.Bekliyor;
 
-            Problem.OlusturulmaTarihi =
-                DateTime.Now;
-
-
-            Problem.Durum =
-                ProblemDurumu.Bekliyor;
-
+            // Seçilen personelleri ara tabloya bağla
+            if (SecilenPersonelIds.Any())
+            {
+                foreach (var personelId in SecilenPersonelIds)
+                {
+                    Problem.ProblemPersoneller.Add(new ProblemPersonel
+                    {
+                        PersonelId = personelId
+                    });
+                }
+            }
 
             _context.Problemler.Add(Problem);
-
-
             await _context.SaveChangesAsync();
-
 
             return RedirectToPage("./Index");
         }
 
-
         private async Task DropdownListeleriniDoldur()
         {
-            var sehirler =
-                await _cityApiService.GetCitiesAsync();
-
+            var sehirler = await _cityApiService.GetCitiesAsync();
 
             SehirlerListesi = sehirler
                 .Select(s => new SelectListItem
@@ -137,16 +114,9 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                 })
                 .ToList();
 
-
-            // Form doğrulama hatasıyla geri döndüyse
-            // seçilmiş şehrin ilçelerini tekrar getir.
             if (SelectedSehirId.HasValue)
             {
-                var ilceler =
-                    await _cityApiService.GetDistrictsAsync(
-                        SelectedSehirId.Value
-                    );
-
+                var ilceler = await _cityApiService.GetDistrictsAsync(SelectedSehirId.Value);
 
                 IlcelerListesi = ilceler
                     .Select(i => new SelectListItem
@@ -157,21 +127,15 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                     .ToList();
             }
 
-
-            var personeller =
-                await _context.Personeller
-                    .OrderBy(p => p.AdSoyad)
-                    .ToListAsync();
-
+            var personeller = await _context.Personeller
+                .OrderBy(p => p.AdSoyad)
+                .ToListAsync();
 
             PersonelListesi = personeller
                 .Select(p => new SelectListItem
                 {
-                    Text =
-                        $"{p.AdSoyad} - {p.Departman}",
-
-                    Value =
-                        p.Id.ToString()
+                    Text = $"{p.AdSoyad} - {p.Departman}",
+                    Value = p.Id.ToString()
                 })
                 .ToList();
         }

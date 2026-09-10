@@ -1,0 +1,92 @@
+@page "{id:int}"
+@model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.DetayModel
+@{
+    ViewData["Title"] = "Problem Detayı";
+}
+
+<div class="container mt-4" style="max-width: 650px;">
+    <div class="card shadow-sm border-0" style="border-top: 4px solid #FA6400 !important; border-radius: 8px;">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h5 class="mb-0 fw-bold" style="color: #003366;">
+                Problem Detayı <span style="color: #FA6400;">#@Model.Problem.Id</span>
+            </h5>
+            <small class="text-muted">@Model.Problem.Sehir / @Model.Problem.Ilce — @Model.Problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")</small>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Problem Başlığı -->
+            <div class="mb-3">
+                <label class="form-label fw-bold text-muted small text-uppercase">Problem Başlığı</label>
+                <div class="form-control bg-light text-dark fw-semibold" style="cursor: default;">
+                    @Model.Problem.Baslik
+                </div>
+            </div>
+
+            <!-- Problem Detayı / Açıklama -->
+            <div class="mb-3">
+                <label class="form-label fw-bold text-muted small text-uppercase">Problem Detayı / Açıklama</label>
+                <div class="form-control bg-light text-muted" style="min-height: 100px; white-space: pre-wrap; cursor: default;">@Model.Problem.Aciklama</div>
+            </div>
+
+           <!-- Problem Durumu ve Öncelik -->
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Problem Durumu</label>
+                    <input type="text" class="form-control bg-light" value="@Model.Problem.Durum" readonly />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Öncelik</label>
+                    <input type="text" class="form-control bg-light" value="@Model.Problem.Oncelik" readonly />
+                </div>
+            </div>
+
+            <!-- Atanan Personeller -->
+            <div class="mb-3">
+                <label class="form-label fw-bold text-muted small text-uppercase d-block">Atanan Personeller</label>
+                <div class="p-3 bg-light border rounded d-flex flex-wrap gap-2">
+                    @if (Model.Problem.ProblemPersoneller != null && Model.Problem.ProblemPersoneller.Any())
+                    {
+                        @foreach (var pp in Model.Problem.ProblemPersoneller.Where(x => x.Personel != null))
+                        {
+                            <a asp-page="/Personeller/Detay" 
+                            asp-route-id="@pp.PersonelId" 
+                            class="badge bg-white text-dark border px-3 py-2 shadow-sm text-decoration-none d-inline-flex align-items-center personel-link" 
+                            style="font-size: 0.9rem; font-weight: 500; transition: all 0.2s ease;">
+                                <i class="bi bi-person-fill text-primary me-2"></i>
+                                <span>@pp.Personel.AdSoyad</span>
+                                <i class="bi bi-box-arrow-up-right ms-2 text-muted" style="font-size: 0.75rem;"></i>
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted small">Atama Yapılmadı</span>
+                    }
+                </div>
+            </div>
+
+            <style>
+                .personel-link:hover {
+                    background-color: #003366 !important;
+                    color: #ffffff !important;
+                    border-color: #003366 !important;
+                    transform: translateY(-1px);
+                }
+                .personel-link:hover i {
+                    color: #ffffff !important;
+                }
+            </style>
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a asp-page="./Index" class="btn btn-outline-secondary">← Listeye Dön</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-page="./DurumGuncelle" asp-route-id="@Model.Problem.Id" class="btn text-white fw-bold px-4" style="background-color: #FA6400;">
+                        Düzenle
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

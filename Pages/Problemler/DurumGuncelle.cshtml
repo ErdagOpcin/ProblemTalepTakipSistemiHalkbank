@@ -1,79 +1,101 @@
-@page
+@page "{id:int}"
 @model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.DurumGuncelleModel
-
 @{
-    ViewData["Title"] = "Durum Güncelle";
+    ViewData["Title"] = "Problemi Güncelle";
 }
 
-<div class="container mt-4">
-
-    <h2 class="mb-4">Problem Durumunu Güncelle</h2>
-
-    <div class="card shadow-sm">
-
-        <div class="card-body">
-
-            <form method="post">
-
-                <input type="hidden"
-                       asp-for="Problem.Id" />
-
-                <div class="mb-3">
-
-                    <label class="form-label fw-bold">
-                        Problem
-                    </label>
-
-                    <input class="form-control"
-                           value="@Model.Problem.Baslik"
-                           disabled />
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label fw-bold">
-                        Atanan Personel
-                    </label>
-
-                    <input class="form-control"
-                           value="@(Model.Problem.Personel?.AdSoyad ?? "Atanmadı")"
-                           disabled />
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label asp-for="Problem.Durum"
-                           class="form-label fw-bold">
-                        Durum
-                    </label>
-
-                    <select asp-for="Problem.Durum"
-                            asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu>()"
-                            class="form-select">
-                    </select>
-
-                </div>
-
-                <button type="submit"
-                        class="btn btn-primary">
-
-                    Durumu Kaydet
-
-                </button>
-
-                <a asp-page="./Index"
-                   class="btn btn-secondary ms-2">
-
-                    Geri Dön
-
-                </a>
-
-            </form>
-
+<div class="container mt-4" style="max-width: 650px;">
+    <div class="card shadow-sm border-0" style="border-top: 4px solid #FA6400 !important; border-radius: 8px;">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h5 class="mb-0 fw-bold" style="color: #003366;">
+                Problemi Güncelle <span style="color: #FA6400;">#@Model.Problem.Id</span>
+            </h5>
+            <small class="text-muted">@Model.Problem.Sehir / @Model.Problem.Ilce — @Model.Problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")</small>
         </div>
 
-    </div>
+        <div class="card-body p-4">
+            <form method="post">
+                <input type="hidden" asp-for="Problem.Id" />
 
+                <!-- Başlık Güncelleme -->
+                <div class="mb-3">
+                    <label asp-for="Problem.Baslik" class="form-label fw-bold">Problem Başlığı</label>
+                    <input asp-for="Problem.Baslik" class="form-control" />
+                    <span asp-validation-for="Problem.Baslik" class="text-danger"></span>
+                </div>
+                <!-- Problem Detayı / Açıklaması -->
+                <div class="mb-3">
+                    <label asp-for="Problem.Aciklama" class="form-label fw-bold">Problem Detayı / Açıklama</label>
+                    <textarea asp-for="Problem.Aciklama" class="form-control" rows="4" placeholder="Problemin detaylarını buraya giriniz..."></textarea>
+                    <span asp-validation-for="Problem.Aciklama" class="text-danger"></span>
+                </div>
+                <!-- Durum Güncelleme -->
+                <div class="mb-3">
+                    <label asp-for="Problem.Durum" class="form-label fw-bold">Problem Durumu</label>
+                    <select asp-for="Problem.Durum" class="form-select" asp-items="Html.GetEnumSelectList(Model.Problem.Durum.GetType())">
+                    </select>
+                    <span asp-validation-for="Problem.Durum" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <!-- Öncelik Güncelleme (Modeldeki enum tipini otomatik yakalar) -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Problem.Oncelik" class="form-label fw-bold">Öncelik</label>
+                        <select asp-for="Problem.Oncelik" class="form-select" asp-items="Html.GetEnumSelectList(Model.Problem.Oncelik.GetType())">
+                        </select>
+                        <span asp-validation-for="Problem.Oncelik" class="text-danger"></span>
+                    </div>
+
+                    <!-- Personel Güncelleme -->
+                    <div class="col-12 mb-3">
+                        <label class="form-label fw-bold text-muted small text-uppercase d-flex justify-content-between align-items-center">
+                            <span>Atanan Personeller</span>
+                            <span class="text-secondary fw-normal" style="text-transform: none;">Birden fazla personel seçebilirsiniz</span>
+                        </label>
+
+                        <div class="border rounded bg-white p-2 shadow-sm" style="max-height: 230px; overflow-y: auto;">
+                            @if (Model.PersonelListesi != null && Model.PersonelListesi.Any())
+                            {
+                                <div class="list-group list-group-flush">
+                                    @foreach (var p in Model.PersonelListesi)
+                                    {
+                                        var isChecked = Model.SecilenPersonelIds.Contains(int.Parse(p.Value));
+                                        var inputId = $"personel_{p.Value}";
+
+                                        <label class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3 border-0 rounded-2 mb-1" 
+                                            for="@inputId" 
+                                            style="cursor: pointer;">
+                                            <input class="form-check-input me-3 mt-0 fs-5 border-secondary-subtle" 
+                                                type="checkbox" 
+                                                name="SecilenPersonelIds" 
+                                                value="@p.Value" 
+                                                id="@inputId" 
+                                                @(isChecked ? "checked" : "")>
+                                            
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-semibold text-dark">@p.Text</span>
+                                            </div>
+                                        </label>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted p-3 text-center small">Kayıtlı personel bulunamadı.</div>
+                            }
+                        </div>
+</div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">İptal</a>
+                    <button type="submit" class="btn text-white fw-bold px-4" style="background-color: #FA6400;">
+                        Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

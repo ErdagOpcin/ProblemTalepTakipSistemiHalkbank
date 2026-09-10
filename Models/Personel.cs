@@ -14,6 +14,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Models
 
         public IdentityUser? IdentityUser { get; set; }
 
-        public List<Problem> Problemler { get; set; } = new List<Problem>();
+        public ICollection<ProblemPersonel> ProblemPersoneller { get; set; } = new List<ProblemPersonel>();
     }
 }

@@ -1092,10 +1092,16 @@
 
                                     <td>
 
-                                        @(problem.Personel != null
-                                            ? problem.Personel.AdSoyad
-                                            : "Atanmadı")
-
+                                        <td>
+                                            @if (problem.ProblemPersoneller != null && problem.ProblemPersoneller.Any())
+                                            {
+                                                @string.Join(", ", problem.ProblemPersoneller.Select(pp => pp.Personel.AdSoyad))
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Atama Yapılmadı</span>
+                                            }
+                                        </td>
                                     </td>
 
                                 </tr>

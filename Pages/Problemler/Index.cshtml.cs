@@ -31,20 +31,19 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
 
         public async Task OnGetAsync()
         {
-            // Problem ve atanmış personel bilgisini birlikte getir.
+            // Problem ve atanmış tüm personellerin bilgisini birlikte getir.
             IQueryable<Problem> query = _context.Problemler
-                .Include(p => p.Personel);
+                .Include(p => p.ProblemPersoneller)
+                    .ThenInclude(pp => pp.Personel);
 
             // Admin olmayan kullanıcı yalnızca
             // kendisine atanmış problemleri görebilir.
             if (!User.IsInRole("Admin"))
             {
-                var currentUserId =
-                    _userManager.GetUserId(User);
+                var currentUserId = _userManager.GetUserId(User);
 
                 query = query.Where(p =>
-                    p.Personel != null &&
-                    p.Personel.IdentityUserId == currentUserId);
+                    p.ProblemPersoneller.Any(pp => pp.Personel.IdentityUserId == currentUserId));
             }
 
             // Kullanıcı bir durum seçtiyse

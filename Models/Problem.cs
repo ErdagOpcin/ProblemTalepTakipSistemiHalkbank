@@ -55,9 +55,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Models
             ErrorMessage =
                 "Lütfen problemi atayacağınız personeli seçiniz."
         )]
-        public int? PersonelId { get; set; }
-
-
-        public Personel? Personel { get; set; }
+        public ICollection<ProblemPersonel> ProblemPersoneller { get; set; } = new List<ProblemPersonel>();
     }
 }

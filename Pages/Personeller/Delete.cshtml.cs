@@ -50,7 +50,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             var personel = await _context.Personeller
-                .Include(p => p.Problemler)
+                .Include(p => p.ProblemPersoneller)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (personel == null)
@@ -70,7 +70,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             // Üzerinde atanmış problem olan personel silinemez.
-            if (personel.Problemler.Any())
+            if (personel.ProblemPersoneller.Any())
             {
                 HataMesaji =
                     "Bu personele atanmış problemler bulunduğu için silinemez.";

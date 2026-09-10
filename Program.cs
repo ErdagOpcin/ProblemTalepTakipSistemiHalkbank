@@ -112,5 +112,24 @@ app.MapStaticAssets()
 app.MapRazorPages()
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
+    // 1. Admin Rolünü Garantiye Al
+    if (!await roleManager.RoleExistsAsync("Admin"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    // 2. Kullanıcıyı Bul ve Admin Rolüne Ekle
+    var targetEmail = "gok@gmail.com"; // Sisteme kayıt olduğun e-posta
+    var user = await userManager.FindByEmailAsync(targetEmail);
+
+    if (user != null && !await userManager.IsInRoleAsync(user, "Admin"))
+    {
+        await userManager.AddToRoleAsync(user, "Admin");
+    }
+}
 app.Run();

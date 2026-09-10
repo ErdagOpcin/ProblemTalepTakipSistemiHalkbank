@@ -172,22 +172,18 @@
                                 </td>
 
                                 <td>
-                                    @(item.Personel != null
-                                        ? item.Personel.AdSoyad
+                                    @(item.ProblemPersoneller != null && item.ProblemPersoneller.Any()
+                                        ? string.Join(", ", item.ProblemPersoneller.Select(pp => pp.Personel.AdSoyad))
                                         : "Atanmadı")
                                 </td>
 
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <td>
-                                        <a asp-page="./DurumGuncelle"
-                                           asp-route-id="@item.Id"
-                                           class="btn btn-sm btn-warning">
-                                            Durum Güncelle
-                                        </a>
-                                    </td>
-                                }
-
+                                <td>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-page="./DurumGuncelle" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Durum Güncelle</a>
+                                    }
+                                    <a asp-page="./Detay" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-1">Detay</a>
+                                </td>
                             </tr>
                         }
                     }
