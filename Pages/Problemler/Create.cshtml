@@ -1,0 +1,168 @@
+@page
+@model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.CreateModel
+
+@{
+    ViewData["Title"] = "Yeni Problem Bildirimi";
+}
+
+<div class="container mt-4" style="max-width: 750px;">
+    <div class="card shadow-sm border-0" style="border-top: 4px solid #FA6400 !important; border-radius: 8px;">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h4 class="mb-0 fw-bold" style="color: #003366;">
+                Yeni Problem Kaydı
+            </h4>
+            <small class="text-muted">Sistemde yeni bir arıza, talep veya problem kaydı oluşturun.</small>
+        </div>
+
+        <div class="card-body p-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Problem Başlığı -->
+                <div class="mb-3">
+                    <label asp-for="Problem.Baslik" class="form-label fw-bold">Problem Başlığı</label>
+                    <input asp-for="Problem.Baslik" class="form-control" placeholder="Örn: ATM Para Sıkışması" required />
+                    <span asp-validation-for="Problem.Baslik" class="text-danger"></span>
+                </div>
+
+                <!-- Açıklama / Detay -->
+                <div class="mb-3">
+                    <label asp-for="Problem.Aciklama" class="form-label fw-bold">Açıklama / Detay</label>
+                    <textarea asp-for="Problem.Aciklama" class="form-control" rows="4" placeholder="Problemin detaylarını açıklayınız..."></textarea>
+                    <span asp-validation-for="Problem.Aciklama" class="text-danger"></span>
+                </div>
+
+                <!-- Bildiren Kişi ve Birim -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Problem.KimdenGeldi" class="form-label fw-bold">Bildiren Kişi / Müşteri</label>
+                        <input asp-for="Problem.KimdenGeldi" class="form-control" placeholder="Örn: Şube Müdürü / Müşteri Adı" />
+                        <span asp-validation-for="Problem.KimdenGeldi" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Problem.Birim" class="form-label fw-bold">İlgili Birim / Şube</label>
+                        <input asp-for="Problem.Birim" class="form-control" placeholder="Örn: Kadıköy Şubesi" />
+                        <span asp-validation-for="Problem.Birim" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Şehir ve İlçe -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SelectedSehirId" class="form-label fw-bold">Şehir</label>
+                        <select asp-for="SelectedSehirId" asp-items="Model.SehirlerListesi" id="sehirSelect" class="form-select">
+                            <option value="">-- Şehir Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="SelectedSehirId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Problem.Ilce" class="form-label fw-bold">İlçe</label>
+                        <select asp-for="Problem.Ilce" asp-items="Model.IlcelerListesi" id="ilceSelect" class="form-select">
+                            <option value="">-- Önce Şehir Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="Problem.Ilce" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Öncelik Derecesi -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Problem.Oncelik" class="form-label fw-bold">Öncelik Derecesi</label>
+                        <select asp-for="Problem.Oncelik" asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik>()" class="form-select">
+                        </select>
+                        <span asp-validation-for="Problem.Oncelik" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Atanan Personeller (Çoklu Seçim / Checkbox Listesi) -->
+                <div class="col-12 mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase d-flex justify-content-between align-items-center">
+                        <span>Atanan Personeller</span>
+                        <span class="text-secondary fw-normal" style="text-transform: none;">Birden fazla personel seçebilirsiniz</span>
+                    </label>
+
+                    <div class="border rounded bg-white p-2 shadow-sm" style="max-height: 220px; overflow-y: auto;">
+                        @if (Model.PersonelListesi != null && Model.PersonelListesi.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var p in Model.PersonelListesi)
+                                {
+                                    var isChecked = Model.SecilenPersonelIds.Contains(int.Parse(p.Value));
+                                    var inputId = $"personel_{p.Value}";
+
+                                    <label class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3 border-0 rounded-2 mb-1" 
+                                           for="@inputId" 
+                                           style="cursor: pointer;">
+                                        <input class="form-check-input me-3 mt-0 fs-5 border-secondary-subtle" 
+                                               type="checkbox" 
+                                               name="SecilenPersonelIds" 
+                                               value="@p.Value" 
+                                               id="@inputId" 
+                                               @(isChecked ? "checked" : "")>
+                                        
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-semibold text-dark">@p.Text</span>
+                                        </div>
+                                    </label>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted p-3 text-center small">Kayıtlı personel bulunamadı.</div>
+                        }
+                    </div>
+                    <small class="text-muted">Problem oluşturulurken doğrudan görevlendirmek istediğiniz personelleri işaretleyin.</small>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        ← Vazgeç / Listeye Dön
+                    </a>
+                    <button type="submit" class="btn text-white fw-bold px-4" style="background-color: #FA6400;">
+                        Problemi Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        const sehirSelect = document.getElementById("sehirSelect");
+        const ilceSelect = document.getElementById("ilceSelect");
+
+        sehirSelect.addEventListener("change", async function () {
+            const sehirId = this.value;
+            ilceSelect.innerHTML = '<option value="">-- İlçe Seçiniz --</option>';
+
+            if (!sehirId) {
+                ilceSelect.innerHTML = '<option value="">-- Önce Şehir Seçiniz --</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`?handler=Ilceler&sehirId=${sehirId}`);
+                if (!response.ok) {
+                    throw new Error("İlçeler alınamadı.");
+                }
+
+                const ilceler = await response.json();
+                ilceler.forEach(function (ilce) {
+                    const option = document.createElement("option");
+                    option.value = ilce.name;
+                    option.textContent = ilce.name;
+                    ilceSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error(error);
+                ilceSelect.innerHTML = '<option value="">İlçeler yüklenemedi</option>';
+            }
+        });
+    </script>
+}

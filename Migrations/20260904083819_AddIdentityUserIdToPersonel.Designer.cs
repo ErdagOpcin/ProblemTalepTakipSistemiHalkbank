@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProblemTalepTakipSistemiHalkbank.Data;
 
@@ -11,9 +12,11 @@ using ProblemTalepTakipSistemiHalkbank.Data;
 namespace ProblemTalepTakipSistemiHalkbank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904083819_AddIdentityUserIdToPersonel")]
+    partial class AddIdentityUserIdToPersonel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,11 +244,9 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdentityUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdentityUserId");
 
                     b.ToTable("Personeller");
                 });
@@ -258,26 +259,19 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Aciklama")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Baslik")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Birim")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CozulmeTarihi")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Detay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Durum")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Ilce")
+                    b.Property<string>("Durum")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -288,34 +282,18 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
                     b.Property<DateTime>("OlusturulmaTarihi")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Oncelik")
+                    b.Property<int?>("PersonelId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Sehir")
+                    b.Property<string>("İl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Problemler");
-                });
-
-            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.ProblemPersonel", b =>
-                {
-                    b.Property<int>("ProblemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PersonelId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OlusturulmaTarihi")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ProblemId", "PersonelId");
-
                     b.HasIndex("PersonelId");
 
-                    b.ToTable("ProblemPersoneller");
+                    b.ToTable("Problems");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -369,42 +347,18 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.Personel", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
-                        .WithMany()
-                        .HasForeignKey("IdentityUserId");
-
-                    b.Navigation("IdentityUser");
-                });
-
-            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.ProblemPersonel", b =>
-                {
-                    b.HasOne("ProblemTalepTakipSistemiHalkbank.Models.Personel", "Personel")
-                        .WithMany("ProblemPersoneller")
-                        .HasForeignKey("PersonelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProblemTalepTakipSistemiHalkbank.Models.Problem", "Problem")
-                        .WithMany("ProblemPersoneller")
-                        .HasForeignKey("ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Personel");
-
-                    b.Navigation("Problem");
-                });
-
-            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.Personel", b =>
-                {
-                    b.Navigation("ProblemPersoneller");
-                });
-
             modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.Problem", b =>
                 {
-                    b.Navigation("ProblemPersoneller");
+                    b.HasOne("ProblemTalepTakipSistemiHalkbank.Models.Personel", "Personel")
+                        .WithMany("Problemler")
+                        .HasForeignKey("PersonelId");
+
+                    b.Navigation("Personel");
+                });
+
+            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.Personel", b =>
+                {
+                    b.Navigation("Problemler");
                 });
 #pragma warning restore 612, 618
         }

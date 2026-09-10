@@ -1,42 +1,135 @@
-using ProblemTalepTakipSistemiHalkbank.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProblemTalepTakipSistemiHalkbank.Data;
+using ProblemTalepTakipSistemiHalkbank.Services;
+
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("DefaultConnection bulunamadı.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-    builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+
+// Veritabanı bağlantısı
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
 {
-    options.User.RequireUniqueEmail = true;
-})
-.AddRoles<IdentityRole>()
-.AddEntityFrameworkStores<ApplicationDbContext>();
+    throw new InvalidOperationException(
+        "DefaultConnection bulunamadı."
+    );
+}
 
-// Add services to the container.
+
+// Entity Framework ve SQL Server
+builder.Services.AddDbContext<ApplicationDbContext>(
+    options =>
+        options.UseSqlServer(connectionString)
+);
+
+
+// Identity ayarları
+builder.Services.AddDefaultIdentity<IdentityUser>(
+    options =>
+    {
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+// HttpClient servisleri
 builder.Services.AddHttpClient<PasswordLeakService>();
+builder.Services.AddHttpClient<CityApiService>();
+
+
+// Giriş yapmamış kullanıcıların
+// uygulama sayfalarına erişmesini engelle
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy =
+        new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+});
+
+
 builder.Services.AddRazorPages();
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
+// Uygulamada kullanılacak rollerin
+// veritabanında bulunmasını garanti eder
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager =
+        scope.ServiceProvider
+            .GetRequiredService<RoleManager<IdentityRole>>();
+
+
+    string[] roles =
+    {
+        "Admin",
+        "Personel"
+    };
+
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(
+                new IdentityRole(role)
+            );
+        }
+    }
+}
+
+
+// HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
 
+app.MapStaticAssets()
+    .AllowAnonymous();
+
+
+app.MapRazorPages()
+    .WithStaticAssets();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    // 1. Admin Rolünü Garantiye Al
+    if (!await roleManager.RoleExistsAsync("Admin"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    // 2. Kullanıcıyı Bul ve Admin Rolüne Ekle
+    var targetEmail = "gok@gmail.com"; // Sisteme kayıt olduğun e-posta
+    var user = await userManager.FindByEmailAsync(targetEmail);
+
+    if (user != null && !await userManager.IsInRoleAsync(user, "Admin"))
+    {
+        await userManager.AddToRoleAsync(user, "Admin");
+    }
+}
 app.Run();
