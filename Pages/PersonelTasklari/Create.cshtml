@@ -1,0 +1,95 @@
+@page
+@model ProblemTalepTakipSistemiHalkbank.Pages.PersonelTasklari.CreateModel
+
+@{
+    ViewData["Title"] = "Yeni Task Ata";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h4 class="mb-0">Yeni Task Ata</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <div class="mb-3">
+                    <label asp-for="PersonelTask.Baslik"
+                           class="form-label">
+                        Task Başlığı
+                    </label>
+
+                    <input asp-for="PersonelTask.Baslik"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PersonelTask.Aciklama"
+                           class="form-label">
+                        Açıklama
+                    </label>
+
+                    <textarea asp-for="PersonelTask.Aciklama"
+                              class="form-control"
+                              rows="4"
+                              required>
+                    </textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PersonelTask.PersonelId"
+                           class="form-label">
+                        Atanacak Personel
+                    </label>
+
+                    <select asp-for="PersonelTask.PersonelId"
+                            asp-items="Model.PersonelListesi"
+                            class="form-select">
+
+                        <option value="">
+                            Personel seçiniz
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PersonelTask.PlanlananEfor"
+                           class="form-label">
+                        Planlanan Efor (Saat)
+                    </label>
+
+                    <input asp-for="PersonelTask.PlanlananEfor"
+                           type="number"
+                           step="0.5"
+                           min="0.5"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Task Ata
+                    </button>
+
+                    <a asp-page="/Index"
+                       class="btn btn-secondary">
+                        İptal
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

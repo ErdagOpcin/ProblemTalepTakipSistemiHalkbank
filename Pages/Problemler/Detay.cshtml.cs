@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -6,14 +8,22 @@ using ProblemTalepTakipSistemiHalkbank.Models;
 
 namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
 {
+    [Authorize]
     public class DetayModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        public DetayModel(ApplicationDbContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public DetayModel(
+            ApplicationDbContext context,
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
         public Problem Problem { get; set; } = default!;
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -23,27 +33,34 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
 
             var problem = await _context.Problemler
                 .Include(p => p.ProblemPersoneller)
-                .ThenInclude(pp => pp.Personel)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                    .ThenInclude(pp => pp.Personel)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (problem == null)
             {
                 return NotFound();
             }
 
-            // Personel sadece kendi görevine bakabilsin (Admin hepsini görebilir)
+            // Admin tüm problemleri görebilir.
+            // Personel sadece kendisine atanmış problemi görebilir.
             if (!User.IsInRole("Admin"))
             {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var currentUserId = _userManager.GetUserId(User);
 
-                // Giriş yapan kullanıcının Id'si bu problemin atanmış personelleri arasında YOKSA erişimi engelle
-                if (!problem.ProblemPersoneller.Any(pp => pp.Personel.IdentityUserId == userId))
+                var personeleAtanmisMi =
+                    problem.ProblemPersoneller.Any(pp =>
+                        pp.Personel != null &&
+                        pp.Personel.IdentityUserId == currentUserId
+                    );
+
+                if (!personeleAtanmisMi)
                 {
                     return Forbid();
                 }
             }
 
             Problem = problem;
+
             return Page();
         }
     }

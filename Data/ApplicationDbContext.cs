@@ -14,6 +14,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Data
         public DbSet<Personel> Personeller { get; set; }
         public DbSet<Problem> Problemler { get; set; }
         public DbSet<ProblemPersonel> ProblemPersoneller { get; set; }
+        public DbSet<PersonelTask> PersonelTasklari { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,12 @@ namespace ProblemTalepTakipSistemiHalkbank.Data
                 .HasOne(pp => pp.Personel)
                 .WithMany(p => p.ProblemPersoneller)
                 .HasForeignKey(pp => pp.PersonelId);
+                // Personel - PersonelTask ilişkisi
+modelBuilder.Entity<PersonelTask>()
+    .HasOne(t => t.Personel)
+    .WithMany(p => p.PersonelTasklari)
+    .HasForeignKey(t => t.PersonelId)
+    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

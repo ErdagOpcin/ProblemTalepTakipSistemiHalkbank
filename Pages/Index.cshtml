@@ -781,7 +781,7 @@
                 </h1>
 
                 <p>
-                    Size atanmış problem ve taleplerin
+                    Size atanmış problem, talepler ve taskların
                     güncel durumunu tek ekrandan takip edebilirsiniz.
                 </p>
             }
@@ -810,7 +810,7 @@
 
 
     <!-- ===================================================
-         İSTATİSTİKLER
+         PROBLEM İSTATİSTİKLERİ
          =================================================== -->
 
     <section class="hb-stats">
@@ -903,6 +903,378 @@
         </div>
 
     </section>
+
+
+
+    <!-- ===================================================
+         TASK İSTATİSTİKLERİ
+         =================================================== -->
+
+    <section class="hb-stats">
+
+
+        <div class="hb-stat-card hb-total">
+
+            <div class="hb-stat-icon">
+                ☑
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Toplam Task
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.ToplamTask
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hb-stat-card hb-waiting">
+
+            <div class="hb-stat-icon">
+                ◷
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Bekleyen Task
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.BekleyenTask
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hb-stat-card hb-progress">
+
+            <div class="hb-stat-icon">
+                ◴
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Planlanan Efor
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.ToplamPlanlananEfor.ToString("0.##")
+                </strong>
+
+                <span class="hb-date">
+                    saat
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="hb-stat-card hb-solved">
+
+            <div class="hb-stat-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span class="hb-stat-label">
+                    Harcanan Efor
+                </span>
+
+                <strong class="hb-stat-number">
+                    @Model.ToplamHarcananEfor.ToString("0.##")
+                </strong>
+
+                <span class="hb-date">
+                    saat
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         TASK & EFOR TAKİBİ
+         =================================================== -->
+
+    <div class="hb-panel"
+         style="margin-bottom:22px;">
+
+        <div class="hb-panel-header">
+
+            <div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <h3>
+                        Task & Efor Takibi
+                    </h3>
+
+                    <p>
+                        Personellere atanan taskları ve efor durumlarını takip edin
+                    </p>
+                }
+                else
+                {
+                    <h3>
+                        Bana Atanan Tasklar
+                    </h3>
+
+                    <p>
+                        Size atanmış taskları görüntüleyin
+                    </p>
+                }
+
+            </div>
+
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-page="/PersonelTasklari/Create"
+                   class="hb-see-all">
+
+                    + Yeni Task Ata
+
+                </a>
+            }
+
+        </div>
+
+
+
+        @if (Model.SonTasklar.Any())
+        {
+
+            <div style="overflow-x:auto;">
+
+                <table class="hb-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Task
+                            </th>
+
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th>
+                                    Personel
+                                </th>
+                            }
+
+
+                            <th>
+                                Planlanan Efor
+                            </th>
+
+                            <th>
+                                Harcanan Efor
+                            </th>
+
+                            <th>
+                                Durum
+                            </th>
+
+
+                            @if (!User.IsInRole("Admin"))
+                            {
+                                <th>
+                                    İşlem
+                                </th>
+                            }
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var task in Model.SonTasklar)
+                        {
+
+                            var taskDurumYazi = task.Durum switch
+                            {
+                                ProblemTalepTakipSistemiHalkbank.Models.TaskDurumu.Bekliyor
+                                    => "Bekliyor",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.TaskDurumu.DevamEdiyor
+                                    => "Devam Ediyor",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.TaskDurumu.Tamamlandi
+                                    => "Tamamlandı",
+
+                                _ => task.Durum.ToString()
+                            };
+
+
+                            var taskDurumClass = task.Durum switch
+                            {
+                                ProblemTalepTakipSistemiHalkbank.Models.TaskDurumu.Bekliyor
+                                    => "hb-badge hb-badge-waiting",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.TaskDurumu.DevamEdiyor
+                                    => "hb-badge hb-badge-progress",
+
+                                ProblemTalepTakipSistemiHalkbank.Models.TaskDurumu.Tamamlandi
+                                    => "hb-badge hb-badge-solved",
+
+                                _ => "hb-badge"
+                            };
+
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="hb-problem-name">
+                                        @task.Baslik
+                                    </div>
+
+                                    <div style="
+                                        color:#778894;
+                                        font-size:11px;
+                                        margin-bottom:4px;
+                                    ">
+                                        @task.Aciklama
+                                    </div>
+
+                                    <span class="hb-date">
+
+                                        @task.OlusturulmaTarihi.ToString(
+                                            "dd.MM.yyyy HH:mm"
+                                        )
+
+                                    </span>
+
+                                </td>
+
+
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td>
+
+                                        @if (task.Personel != null)
+                                        {
+                                            @task.Personel.AdSoyad
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                Personel bulunamadı
+                                            </span>
+                                        }
+
+                                    </td>
+                                }
+
+
+                                <td>
+
+                                    <strong>
+                                        @task.PlanlananEfor.ToString("0.##") saat
+                                    </strong>
+
+                                </td>
+
+
+                                <td>
+
+                                    @if (task.HarcananEfor.HasValue)
+                                    {
+                                        <strong>
+                                            @task.HarcananEfor.Value.ToString("0.##") saat
+                                        </strong>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Henüz girilmedi
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="@taskDurumClass">
+                                        @taskDurumYazi
+                                    </span>
+
+                                </td>
+
+
+                                @if (!User.IsInRole("Admin"))
+                                {
+                                    <td>
+
+                                        <a asp-page="/PersonelTasklari/Update"
+                                           asp-route-id="@task.Id"
+                                           class="btn btn-sm btn-primary">
+
+                                            Efor Gir / Güncelle
+
+                                        </a>
+
+                                    </td>
+                                }
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+        else
+        {
+
+            <div class="hb-empty">
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <span>
+                        Henüz oluşturulmuş bir task bulunmuyor.
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        Size atanmış bir task bulunmuyor.
+                    </span>
+                }
+
+            </div>
+
+        }
+
+    </div>
 
 
 
@@ -1053,15 +1425,15 @@
                                     <td>
 
                                         <div class="hb-problem-name">
-
                                             @problem.Baslik
-
                                         </div>
 
 
                                         <span class="hb-date">
 
-                                            @problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")
+                                            @problem.OlusturulmaTarihi.ToString(
+                                                "dd.MM.yyyy HH:mm"
+                                            )
 
                                         </span>
 
@@ -1071,9 +1443,7 @@
                                     <td>
 
                                         <span class="@oncelikClass">
-
                                             @oncelikYazi
-
                                         </span>
 
                                     </td>
@@ -1082,9 +1452,7 @@
                                     <td>
 
                                         <span class="@durumClass">
-
                                             @durumYazi
-
                                         </span>
 
                                     </td>
@@ -1092,16 +1460,24 @@
 
                                     <td>
 
-                                        <td>
-                                            @if (problem.ProblemPersoneller != null && problem.ProblemPersoneller.Any())
-                                            {
-                                                @string.Join(", ", problem.ProblemPersoneller.Select(pp => pp.Personel.AdSoyad))
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">Atama Yapılmadı</span>
-                                            }
-                                        </td>
+                                        @if (
+                                            problem.ProblemPersoneller != null &&
+                                            problem.ProblemPersoneller.Any()
+                                        )
+                                        {
+                                            @string.Join(
+                                                ", ",
+                                                problem.ProblemPersoneller
+                                                    .Select(pp => pp.Personel.AdSoyad)
+                                            )
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                Atama Yapılmadı
+                                            </span>
+                                        }
+
                                     </td>
 
                                 </tr>
@@ -1179,6 +1555,29 @@
 
                                 <small>
                                     Yeni problem kaydı oluştur
+                                </small>
+
+                            </div>
+
+                        </a>
+
+
+
+                        <a asp-page="/PersonelTasklari/Create"
+                           class="hb-action hb-action-orange">
+
+                            <span class="hb-action-icon">
+                                ✓
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Yeni Task Ata
+                                </strong>
+
+                                <small>
+                                    Personele yeni görev oluştur
                                 </small>
 
                             </div>
