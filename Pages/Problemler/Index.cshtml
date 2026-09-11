@@ -20,26 +20,64 @@
 
     </div>
 
-    <form method="get" class="row mb-3">
+    <!-- Filtreleme Kartı -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 10px; background-color: #f8fafc;">
+        <div class="card-body p-3">
+            <form method="get">
+                <div class="row g-3 align-items-end">
+                    
+                    <!-- Durum Filtresi -->
+                    <div class="col-md-3">
+                        <label asp-for="DurumFiltre" class="form-label fw-bold small text-muted text-uppercase mb-1">
+                            Durum
+                        </label>
+                        <select asp-for="DurumFiltre"
+                                asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu>()"
+                                class="form-select"
+                                onchange="this.form.submit()">
+                            <option value="">-- Tüm Durumlar --</option>
+                        </select>
+                    </div>
 
-        <div class="col-md-4">
+                    <!-- Öncelik Filtresi -->
+                    <div class="col-md-3">
+                        <label asp-for="SecilenOncelik" class="form-label fw-bold small text-muted text-uppercase mb-1">
+                            Öncelik
+                        </label>
+                        <select asp-for="SecilenOncelik" 
+                                asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik>()" 
+                                class="form-select" 
+                                onchange="this.form.submit()">
+                            <option value="">-- Tüm Öncelikler --</option>
+                        </select>
+                    </div>
 
-            <label asp-for="DurumFiltre" class="form-label fw-bold">
-                Duruma Göre Filtrele:
-            </label>
+                    <!-- Atanan Personel Filtresi -->
+                    <div class="col-md-3">
+                        <label asp-for="SecilenPersonelId" class="form-label fw-bold small text-muted text-uppercase mb-1">
+                            Atanan Personel
+                        </label>
+                        <select asp-for="SecilenPersonelId" 
+                                asp-items="Model.PersonelListesi" 
+                                class="form-select" 
+                                onchange="this.form.submit()">
+                            <option value="">-- Tüm Personeller --</option>
+                        </select>
+                    </div>
 
-            <select asp-for="DurumFiltre"
-                    asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu>()"
-                    class="form-select"
-                    onchange="this.form.submit()">
+                    <!-- Filtreleri Temizle Butonu (Her zaman görünür ve tabana hizalı) -->
+                    <div class="col-md-3">
+                        <label class="form-label d-none d-md-block small mb-1" style="visibility: hidden;">Boşluk</label>
+                        <a asp-page="./Index" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1" style="height: 38px;">
+                            <i class="bi bi-x-circle"></i>
+                            <span>Filtreleri Temizle</span>
+                        </a>
+                    </div>
 
-                <option value="">-- Tüm Durumlar --</option>
-
-            </select>
-
+                </div>
+            </form>
         </div>
-
-    </form>
+    </div>
 
     <div class="card shadow-sm">
 

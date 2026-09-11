@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProblemTalepTakipSistemiHalkbank.Data;
 
@@ -11,9 +12,11 @@ using ProblemTalepTakipSistemiHalkbank.Data;
 namespace ProblemTalepTakipSistemiHalkbank.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260911083725_AddBildirimEntity")]
+    partial class AddBildirimEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,47 +290,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
                     b.ToTable("Personeller");
                 });
 
-            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.PersonelTask", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Aciklama")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Baslik")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Durum")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("HarcananEfor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("OlusturulmaTarihi")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PersonelId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PlanlananEfor")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("TamamlanmaTarihi")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PersonelId");
-
-                    b.ToTable("PersonelTasklari");
-                });
-
             modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.Problem", b =>
                 {
                     b.Property<int>("Id")
@@ -475,17 +437,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
                     b.Navigation("IdentityUser");
                 });
 
-            modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.PersonelTask", b =>
-                {
-                    b.HasOne("ProblemTalepTakipSistemiHalkbank.Models.Personel", "Personel")
-                        .WithMany("PersonelTasklari")
-                        .HasForeignKey("PersonelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Personel");
-                });
-
             modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.ProblemPersonel", b =>
                 {
                     b.HasOne("ProblemTalepTakipSistemiHalkbank.Models.Personel", "Personel")
@@ -507,8 +458,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Migrations
 
             modelBuilder.Entity("ProblemTalepTakipSistemiHalkbank.Models.Personel", b =>
                 {
-                    b.Navigation("PersonelTasklari");
-
                     b.Navigation("ProblemPersoneller");
                 });
 
