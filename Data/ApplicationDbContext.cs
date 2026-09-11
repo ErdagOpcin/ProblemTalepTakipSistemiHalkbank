@@ -14,6 +14,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Data
         public DbSet<Personel> Personeller { get; set; }
         public DbSet<Problem> Problemler { get; set; }
         public DbSet<ProblemPersonel> ProblemPersoneller { get; set; }
+        public DbSet<Bildirim> Bildirimler { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

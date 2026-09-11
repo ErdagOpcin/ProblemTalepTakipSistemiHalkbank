@@ -53,7 +53,7 @@ builder.Services.AddAuthorization(options =>
 
 
 builder.Services.AddRazorPages();
-
+builder.Services.AddScoped<IBildirimServisi, BildirimServisi>();
 
 var app = builder.Build();
 
