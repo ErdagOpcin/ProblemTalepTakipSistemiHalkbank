@@ -7,7 +7,7 @@ using ProblemTalepTakipSistemiHalkbank.Models;
 
 namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class DetayModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +18,9 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
         }
 
         public Personel Personel { get; set; } = default!;
-
+        public int ToplamGorevSayisi { get; set; }
+        public int TamamlananGorevSayisi { get; set; }
+        public int DevamEdenGorevSayisi { get; set; }
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -37,6 +39,14 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
             }
 
             Personel = personel;
+            
+            var atananProblemler = personel.ProblemPersoneller
+                .Select(pp => pp.Problem)
+                .Where(p => p != null)
+                .ToList();
+            ToplamGorevSayisi = atananProblemler.Count;
+            TamamlananGorevSayisi = atananProblemler.Count(p => p.Durum == ProblemDurumu.Cozuldu);
+            DevamEdenGorevSayisi = ToplamGorevSayisi - TamamlananGorevSayisi;
             return Page();
         }
     }

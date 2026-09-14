@@ -25,6 +25,12 @@
                             <span asp-validation-for="Personel.Departman" class="text-danger"></span>
                         </div>
 
+                        <div class="form-group mb-3">
+                            <label asp-for="Personel.Email" class="form-label fw-bold">E-Posta Adresi</label>
+                            <input asp-for="Personel.Email" type="email" class="form-control" placeholder="ornek@halkbank.com.tr" required />
+                            <span asp-validation-for="Personel.Email" class="text-danger small"></span>
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a asp-page="Index" class="btn btn-secondary">Geri Dön</a>
                             <button type="submit" class="btn btn-success">Kaydet</button>

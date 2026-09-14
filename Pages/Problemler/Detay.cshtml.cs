@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using ProblemTalepTakipSistemiHalkbank.Data;
 using ProblemTalepTakipSistemiHalkbank.Models;
 
 namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
 {
+    [Authorize]
     public class DetayModel : PageModel
     {
         private readonly ApplicationDbContext _context;

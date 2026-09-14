@@ -49,7 +49,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Bildirimler
             {
                 bildirim.OkunduMu = true;
                 await _context.SaveChangesAsync();
-                return RedirectToPage("/Problemler/Details", new { id = bildirim.ProblemId });
+                return RedirectToPage("/Problemler/Detay", new { id = bildirim.ProblemId });
             }
 
             return RedirectToPage("./Tumu");

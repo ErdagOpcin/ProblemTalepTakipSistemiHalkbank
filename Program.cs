@@ -39,7 +39,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(
 // HttpClient servisleri
 builder.Services.AddHttpClient<PasswordLeakService>();
 builder.Services.AddHttpClient<CityApiService>();
-
+builder.Services.AddScoped<IEmailServisi, EmailServisi>();
 
 // Giriş yapmamış kullanıcıların
 // uygulama sayfalarına erişmesini engelle
