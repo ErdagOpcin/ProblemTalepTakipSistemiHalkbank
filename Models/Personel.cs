@@ -9,6 +9,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Models
         public string AdSoyad { get; set; } = string.Empty;
 
         public string Departman { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
         public string? IdentityUserId { get; set; }
 

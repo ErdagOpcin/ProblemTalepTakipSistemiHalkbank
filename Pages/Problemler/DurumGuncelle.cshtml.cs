@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProblemTalepTakipSistemiHalkbank.Data;
 using ProblemTalepTakipSistemiHalkbank.Models;
@@ -15,19 +18,21 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
         private readonly ApplicationDbContext _context;
         private readonly IBildirimServisi _bildirimServisi;
 
-        // 1. Servisi Constructor'a ekle:
         public DurumGuncelleModel(ApplicationDbContext context, IBildirimServisi bildirimServisi)
         {
             _context = context;
             _bildirimServisi = bildirimServisi;
         }
+
         [BindProperty]
         public Problem Problem { get; set; } = default!;
 
+        // Formdan seçilen personel ID'lerini yakalayan liste:
         [BindProperty]
-        public List<int> SecilenPersonelIds { get; set; } = new();
+        public List<int> SecilenPersonelIdleri { get; set; } = new();
 
-        public MultiSelectList PersonelListesi { get; set; } = default!;
+        // Checkbox listesinde aktif görev sayılarını gösteren DTO listesi:
+        public List<PersonelSecimDto> PersonelListesi { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -47,9 +52,9 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             }
 
             Problem = problem;
-            SecilenPersonelIds = Problem.ProblemPersoneller.Select(pp => pp.PersonelId).ToList();
 
-            await PersonelListesiniYukleAsync(SecilenPersonelIds);
+            // Personelleri ve aktif görev sayılarını yükle
+            await PersonelListesiniYukleAsync(problem.Id);
 
             return Page();
         }
@@ -72,7 +77,7 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                 .Select(pp => pp.PersonelId)
                 .ToList();
 
-            var yeniPersonelIdler = SecilenPersonelIds ?? new List<int>();
+            var yeniPersonelIdler = SecilenPersonelIdleri ?? new List<int>();
 
             // 2. FARK ANALİZİ (Personel Atamaları)
             var eklenenPersoneller = yeniPersonelIdler.Except(eskiPersonelIdler).ToList();
@@ -157,12 +162,11 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                     $"'{mevcutProblem.Baslik}' görevinin önceliği '{mevcutProblem.Oncelik}' olarak güncellendi.");
             }
 
-            // Senaryo 4 & 5: Durum değiştiğinde veya işlem bittiğinde
+            // Senaryo 5: Durum değiştiğinde veya işlem bittiğinde
             if (eskiDurum != mevcutProblem.Durum && yeniPersonelIdler.Any())
             {
                 if (mevcutProblem.Durum == ProblemDurumu.Cozuldu)
                 {
-                    // Senaryo 5: İşlem bittiğinde
                     await _bildirimServisi.TopluBildirimGonderAsync(
                         yeniPersonelIdler,
                         mevcutProblem.Id,
@@ -171,7 +175,6 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                 }
                 else
                 {
-                    // Senaryo 4: Durum güncellendiğinde
                     await _bildirimServisi.TopluBildirimGonderAsync(
                         yeniPersonelIdler,
                         mevcutProblem.Id,
@@ -183,13 +186,35 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             return RedirectToPage("./Index");
         }
 
-        private async Task PersonelListesiniYukleAsync(List<int> seciliIds)
+        private async Task PersonelListesiniYukleAsync(int problemId)
         {
-            var personeller = await _context.Personeller
-                .Select(p => new { p.Id, p.AdSoyad })
+            PersonelListesi = await _context.Personeller
+                .Select(p => new PersonelSecimDto
+                {
+                    Id = p.Id,
+                    AdSoyad = p.AdSoyad,
+                    Departman = p.Departman,
+                    // Çözülmemiş işleri say:
+                    AktifGorevSayisi = p.ProblemPersoneller.Count(pp =>
+                        pp.Problem.Durum != ProblemDurumu.Cozuldu),
+                    SeciliMi = p.ProblemPersoneller.Any(pp => pp.ProblemId == problemId)
+                })
+                .OrderBy(p => p.AktifGorevSayisi) // En az işi olandan en çoka
                 .ToListAsync();
 
-            PersonelListesi = new MultiSelectList(personeller, "Id", "AdSoyad", seciliIds);
+            SecilenPersonelIdleri = PersonelListesi
+                .Where(p => p.SeciliMi)
+                .Select(p => p.Id)
+                .ToList();
         }
+    }
+
+    public class PersonelSecimDto
+    {
+        public int Id { get; set; }
+        public string AdSoyad { get; set; } = string.Empty;
+        public string Departman { get; set; } = string.Empty;
+        public int AktifGorevSayisi { get; set; }
+        public bool SeciliMi { get; set; }
     }
 }

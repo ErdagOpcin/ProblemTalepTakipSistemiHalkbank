@@ -1,4 +1,7 @@
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +14,12 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public DeleteModel(ApplicationDbContext context)
+        public DeleteModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         [BindProperty]
@@ -60,26 +65,28 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Personeller
 
             Personel = personel;
 
-            // Bir Identity kullanıcısına bağlı personel silinemez.
-            if (!string.IsNullOrWhiteSpace(personel.IdentityUserId))
-            {
-                HataMesaji =
-                    "Bu personel bir kullanıcı hesabına bağlı olduğu için silinemez.";
-
-                return Page();
-            }
-
-            // Üzerinde atanmış problem olan personel silinemez.
+            // 1. Üzerinde aktif problem varsa problem atamalarını tablodan kaldır (foreign key hatası vermesin)
             if (personel.ProblemPersoneller.Any())
             {
-                HataMesaji =
-                    "Bu personele atanmış problemler bulunduğu için silinemez.";
-
-                return Page();
+                _context.ProblemPersoneller.RemoveRange(personel.ProblemPersoneller);
             }
 
-            _context.Personeller.Remove(personel);
+            // 2. Personele ait bildirimleri temizle
+            var bildirimler = _context.Bildirimler.Where(b => b.PersonelId == personel.Id);
+            _context.Bildirimler.RemoveRange(bildirimler);
 
+            // 3. Bağlı Identity hesabını (AspNetUsers) sil
+            if (!string.IsNullOrWhiteSpace(personel.IdentityUserId))
+            {
+                var user = await _userManager.FindByIdAsync(personel.IdentityUserId);
+                if (user != null)
+                {
+                    await _userManager.DeleteAsync(user);
+                }
+            }
+
+            // 4. Personel kaydını sil
+            _context.Personeller.Remove(personel);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

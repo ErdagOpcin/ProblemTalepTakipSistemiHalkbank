@@ -1,92 +1,227 @@
 @page "{id:int}"
 @model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.DetayModel
 @{
-    ViewData["Title"] = "Problem Detayı";
+    ViewData["Title"] = $"Problem Detayı #{Model.Problem.Id}";
+
+    // Durum Rozet Rengi
+    var durumBadgeClass = Model.Problem.Durum switch
+    {
+        Models.ProblemDurumu.Cozuldu => "bg-success text-white",
+        Models.ProblemDurumu.IslemeAlindi => "bg-primary text-white",
+        _ => "bg-warning text-dark"
+    };
+
+    // Öncelik Rozet Rengi
+    var oncelikBadgeClass = Model.Problem.Oncelik switch
+    {
+        Models.ProblemOncelik.Yuksek => "bg-danger text-white",
+        Models.ProblemOncelik.Orta => "bg-warning text-dark",
+        _ => "bg-secondary text-white"
+    };
 }
 
-<div class="container mt-4" style="max-width: 650px;">
-    <div class="card shadow-sm border-0" style="border-top: 4px solid #FA6400 !important; border-radius: 8px;">
-        <div class="card-header bg-white py-3 border-bottom">
-            <h5 class="mb-0 fw-bold" style="color: #003366;">
-                Problem Detayı <span style="color: #FA6400;">#@Model.Problem.Id</span>
-            </h5>
-            <small class="text-muted">@Model.Problem.Sehir / @Model.Problem.Ilce — @Model.Problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")</small>
+<div class="container-fluid px-4 py-3">
+
+    <!-- Üst Başlık ve Bilgi Çubuğu -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h4 class="mb-1 fw-bold text-dark">
+                <i class="bi bi-ticket-detailed text-primary me-2"></i>Problem Detayı 
+                <span class="text-primary">#@Model.Problem.Id</span>
+            </h4>
+            <span class="text-muted small">
+                <i class="bi bi-geo-alt me-1"></i>@Model.Problem.Sehir / @Model.Problem.Ilce &mdash; 
+                <i class="bi bi-clock-history me-1"></i>@Model.Problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")
+                @if (Model.Problem.CozulmeTarihi.HasValue)
+                {
+                    <span class="ms-2 text-success">
+                        &mdash; <i class="bi bi-check-circle-fill me-1"></i>Çözülme: @Model.Problem.CozulmeTarihi.Value.ToString("dd.MM.yyyy HH:mm")
+                    </span>
+                }
+            </span>
         </div>
+        <div class="d-flex gap-2">
+            <a asp-page="./Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Listeye Dön
+            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-page="./DurumGuncelle" asp-route-id="@Model.Problem.Id" class="btn btn-primary btn-sm px-3"
+                   style="background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%); border: none;">
+                    <i class="bi bi-pencil-square me-1"></i>Problemi Güncelle
+                </a>
+            }
+        </div>
+    </div>
 
-        <div class="card-body p-4">
-            <!-- Problem Başlığı -->
-            <div class="mb-3">
-                <label class="form-label fw-bold text-muted small text-uppercase">Problem Başlığı</label>
-                <div class="form-control bg-light text-dark fw-semibold" style="cursor: default;">
-                    @Model.Problem.Baslik
+    <div class="row g-4">
+        
+        <!-- SOL KOLON: Problem Ana Detayları ve Atanan Kişiler (Genişlik: 7 Birim) -->
+        <div class="col-lg-7 col-md-12">
+            
+            <!-- Ana Problem Kartı -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4 overflow-hidden">
+                <div class="card-header text-white py-3 d-flex justify-content-between align-items-center"
+                     style="background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="bi bi-card-heading me-2"></i>Problem Başlığı & Açıklama
+                    </h5>
+                    <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill shadow-sm">
+                        Kayıt #@Model.Problem.Id
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <label class="text-muted small fw-semibold text-uppercase d-block mb-1">Problem Başlığı</label>
+                        <h4 class="fw-bold text-dark mb-0">@Model.Problem.Baslik</h4>
+                    </div>
+
+                    <!-- Problem Detayı / Açıklama -->
+                    <div class="mb-2">
+                        <label class="text-muted small fw-semibold text-uppercase d-block mb-2">Açıklama / Detay</label>
+                        <div class="p-3 bg-light rounded-2 border-start border-4 border-primary text-dark" 
+                            style="white-space: pre-line; line-height: 1.6; font-size: 0.95rem;">
+                            @(string.IsNullOrWhiteSpace(Model.Problem.Aciklama) ? "Açıklama belirtilmemiş." : Model.Problem.Aciklama)
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Problem Detayı / Açıklama -->
-            <div class="mb-3">
-                <label class="form-label fw-bold text-muted small text-uppercase">Problem Detayı / Açıklama</label>
-                <div class="form-control bg-light text-muted" style="min-height: 100px; white-space: pre-wrap; cursor: default;">@Model.Problem.Aciklama</div>
-            </div>
-
-           <!-- Problem Durumu ve Öncelik -->
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold text-muted small text-uppercase">Problem Durumu</label>
-                    <input type="text" class="form-control bg-light" value="@Model.Problem.Durum" readonly />
+            <!-- Atanan Personeller Kartı -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-dark">
+                        <i class="bi bi-people-fill text-primary me-2"></i>Görevlendirilen Personeller
+                    </h6>
+                    <span class="badge bg-light text-dark border">
+                        @(Model.Problem.ProblemPersoneller?.Count(x => x.Personel != null) ?? 0) Personel
+                    </span>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold text-muted small text-uppercase">Öncelik</label>
-                    <input type="text" class="form-control bg-light" value="@Model.Problem.Oncelik" readonly />
-                </div>
-            </div>
-
-            <!-- Atanan Personeller -->
-            <div class="mb-3">
-                <label class="form-label fw-bold text-muted small text-uppercase d-block">Atanan Personeller</label>
-                <div class="p-3 bg-light border rounded d-flex flex-wrap gap-2">
-                    @if (Model.Problem.ProblemPersoneller != null && Model.Problem.ProblemPersoneller.Any())
+                <div class="card-body p-3">
+                    @if (Model.Problem.ProblemPersoneller != null && Model.Problem.ProblemPersoneller.Any(x => x.Personel != null))
                     {
-                        @foreach (var pp in Model.Problem.ProblemPersoneller.Where(x => x.Personel != null))
-                        {
-                            <a asp-page="/Personeller/Detay" 
-                            asp-route-id="@pp.PersonelId" 
-                            class="badge bg-white text-dark border px-3 py-2 shadow-sm text-decoration-none d-inline-flex align-items-center personel-link" 
-                            style="font-size: 0.9rem; font-weight: 500; transition: all 0.2s ease;">
-                                <i class="bi bi-person-fill text-primary me-2"></i>
-                                <span>@pp.Personel.AdSoyad</span>
-                                <i class="bi bi-box-arrow-up-right ms-2 text-muted" style="font-size: 0.75rem;"></i>
-                            </a>
-                        }
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var pp in Model.Problem.ProblemPersoneller.Where(x => x.Personel != null))
+                            {
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 bg-white hover-shadow-sm">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-circle bg-primary bg-opacity-10 text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                            @(pp.Personel.AdSoyad.Length > 0 ? pp.Personel.AdSoyad.Substring(0, 1).ToUpper() : "P")
+                                        </div>
+                                        <div>
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                            <a asp-page="/Personeller/Detay" asp-route-id="@pp.PersonelId" class="fw-bold text-dark text-decoration-none">
+                                                @pp.Personel.AdSoyad
+                                            </a>
+                                            }
+                                            <div class="small text-muted">
+                                                <i class="bi bi-building me-1"></i>@pp.Personel.Departman
+                                                <span class="mx-1">&bull;</span>
+                                                <i class="bi bi-envelope me-1"></i>@pp.Personel.Email
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                    <a asp-page="/Personeller/Detay" asp-route-id="@pp.PersonelId" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-person-lines-fill me-1"></i>Profile Git
+                                    </a>
+                                    }
+                                </div>
+                            }
+                        </div>
                     }
                     else
                     {
-                        <span class="text-muted small">Atama Yapılmadı</span>
+                        <div class="alert alert-warning mb-0 small">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Bu probleme henüz atanmış bir personel bulunmamaktadır.
+                        </div>
                     }
                 </div>
             </div>
 
-            <style>
-                .personel-link:hover {
-                    background-color: #003366 !important;
-                    color: #ffffff !important;
-                    border-color: #003366 !important;
-                    transform: translateY(-1px);
-                }
-                .personel-link:hover i {
-                    color: #ffffff !important;
-                }
-            </style>
-            <hr class="my-4" />
-
-            <div class="d-flex justify-content-between align-items-center">
-                <a asp-page="./Index" class="btn btn-outline-secondary">← Listeye Dön</a>
-                @if (User.IsInRole("Admin"))
-                {
-                    <a asp-page="./DurumGuncelle" asp-route-id="@Model.Problem.Id" class="btn text-white fw-bold px-4" style="background-color: #FA6400;">
-                        Düzenle
-                    </a>
-                }
-            </div>
         </div>
+
+        <!-- SAĞ KOLON: Durum Paneli & Künye (Genişlik: 5 Birim) -->
+        <div class="col-lg-5 col-md-12">
+            
+            <!-- Durum ve Öncelik Kartı -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="mb-0 fw-bold text-dark">
+                        <i class="bi bi-sliders text-primary me-2"></i>Durum ve Öncelik Durumu
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 bg-light text-center">
+                                <span class="text-muted small d-block mb-1">Problem Durumu</span>
+                                <span class="badge rounded-pill @durumBadgeClass px-3 py-2 fs-6">
+                                    @Model.Problem.Durum
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 bg-light text-center">
+                                <span class="text-muted small d-block mb-1">Öncelik Seviyesi</span>
+                                <span class="badge rounded-pill @oncelikBadgeClass px-3 py-2 fs-6">
+                                    @Model.Problem.Oncelik
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kayıt Künyesi & Konum -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="mb-0 fw-bold text-dark">
+                        <i class="bi bi-info-circle-fill text-primary me-2"></i>Kayıt Künyesi & Konum
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">Kayıt Numarası (ID):</span>
+                            <span class="fw-bold">#@Model.Problem.Id</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">Şehir / İlçe:</span>
+                            <span class="fw-semibold">@Model.Problem.Sehir / @Model.Problem.Ilce</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between">
+                            <span class="text-muted">Oluşturulma Tarihi:</span>
+                            <span class="fw-medium">@Model.Problem.OlusturulmaTarihi.ToString("dd MMMM yyyy HH:mm")</span>
+                        </li>
+                        @if (Model.Problem.CozulmeTarihi.HasValue)
+                        {
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">Çözülme Tarihi:</span>
+                                <span class="fw-semibold text-success">@Model.Problem.CozulmeTarihi.Value.ToString("dd MMMM yyyy HH:mm")</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <!-- Hızlı İşlem Paneli -->
+                <div class="card shadow-sm border-0 rounded-3 bg-light">
+                    <div class="card-body p-3 text-center">
+                        <p class="small text-muted mb-2">Durum güncellemesi veya personel ataması yapmak için:</p>
+                        <a asp-page="./DurumGuncelle" asp-route-id="@Model.Problem.Id" class="btn btn-primary w-100 fw-medium"
+                           style="background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%); border: none;">
+                            <i class="bi bi-pencil-square me-1"></i>Durumu ve Atamaları Güncelle
+                        </a>
+                    </div>
+                </div>
+            }
+
+        </div>
+
     </div>
 </div>

@@ -1,101 +1,159 @@
 @page "{id:int}"
 @model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.DurumGuncelleModel
+
 @{
-    ViewData["Title"] = "Problemi Güncelle";
+    ViewData["Title"] = $"Problemi Güncelle #{Model.Problem.Id}";
 }
 
-<div class="container mt-4" style="max-width: 650px;">
-    <div class="card shadow-sm border-0" style="border-top: 4px solid #FA6400 !important; border-radius: 8px;">
-        <div class="card-header bg-white py-3 border-bottom">
-            <h5 class="mb-0 fw-bold" style="color: #003366;">
-                Problemi Güncelle <span style="color: #FA6400;">#@Model.Problem.Id</span>
-            </h5>
-            <small class="text-muted">@Model.Problem.Sehir / @Model.Problem.Ilce — @Model.Problem.OlusturulmaTarihi.ToString("dd.MM.yyyy HH:mm")</small>
+<div class="container-fluid px-4 py-3">
+
+    <!-- Üst Başlık ve Bilgi Çubuğu -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h4 class="mb-1 fw-bold text-dark">
+                <i class="bi bi-pencil-square text-primary me-2"></i>Problemi Güncelle 
+                <span class="text-primary">#@Model.Problem.Id</span>
+            </h4>
+            <span class="text-muted small">
+                <i class="bi bi-geo-alt me-1"></i>Çanakkale / Gökçeada &mdash; 
+                <i class="bi bi-calendar3 me-1"></i>14.09.2026 11:50
+            </span>
         </div>
-
-        <div class="card-body p-4">
-            <form method="post">
-                <input type="hidden" asp-for="Problem.Id" />
-
-                <!-- Başlık Güncelleme -->
-                <div class="mb-3">
-                    <label asp-for="Problem.Baslik" class="form-label fw-bold">Problem Başlığı</label>
-                    <input asp-for="Problem.Baslik" class="form-control" />
-                    <span asp-validation-for="Problem.Baslik" class="text-danger"></span>
-                </div>
-                <!-- Problem Detayı / Açıklaması -->
-                <div class="mb-3">
-                    <label asp-for="Problem.Aciklama" class="form-label fw-bold">Problem Detayı / Açıklama</label>
-                    <textarea asp-for="Problem.Aciklama" class="form-control" rows="4" placeholder="Problemin detaylarını buraya giriniz..."></textarea>
-                    <span asp-validation-for="Problem.Aciklama" class="text-danger"></span>
-                </div>
-                <!-- Durum Güncelleme -->
-                <div class="mb-3">
-                    <label asp-for="Problem.Durum" class="form-label fw-bold">Problem Durumu</label>
-                    <select asp-for="Problem.Durum" class="form-select" asp-items="Html.GetEnumSelectList(Model.Problem.Durum.GetType())">
-                    </select>
-                    <span asp-validation-for="Problem.Durum" class="text-danger"></span>
-                </div>
-
-                <div class="row">
-                    <!-- Öncelik Güncelleme (Modeldeki enum tipini otomatik yakalar) -->
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Problem.Oncelik" class="form-label fw-bold">Öncelik</label>
-                        <select asp-for="Problem.Oncelik" class="form-select" asp-items="Html.GetEnumSelectList(Model.Problem.Oncelik.GetType())">
-                        </select>
-                        <span asp-validation-for="Problem.Oncelik" class="text-danger"></span>
-                    </div>
-
-                    <!-- Personel Güncelleme -->
-                    <div class="col-12 mb-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase d-flex justify-content-between align-items-center">
-                            <span>Atanan Personeller</span>
-                            <span class="text-secondary fw-normal" style="text-transform: none;">Birden fazla personel seçebilirsiniz</span>
-                        </label>
-
-                        <div class="border rounded bg-white p-2 shadow-sm" style="max-height: 230px; overflow-y: auto;">
-                            @if (Model.PersonelListesi != null && Model.PersonelListesi.Any())
-                            {
-                                <div class="list-group list-group-flush">
-                                    @foreach (var p in Model.PersonelListesi)
-                                    {
-                                        var isChecked = Model.SecilenPersonelIds.Contains(int.Parse(p.Value));
-                                        var inputId = $"personel_{p.Value}";
-
-                                        <label class="list-group-item list-group-item-action d-flex align-items-center py-2 px-3 border-0 rounded-2 mb-1" 
-                                            for="@inputId" 
-                                            style="cursor: pointer;">
-                                            <input class="form-check-input me-3 mt-0 fs-5 border-secondary-subtle" 
-                                                type="checkbox" 
-                                                name="SecilenPersonelIds" 
-                                                value="@p.Value" 
-                                                id="@inputId" 
-                                                @(isChecked ? "checked" : "")>
-                                            
-                                            <div class="d-flex flex-column">
-                                                <span class="fw-semibold text-dark">@p.Text</span>
-                                            </div>
-                                        </label>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="text-muted p-3 text-center small">Kayıtlı personel bulunamadı.</div>
-                            }
-                        </div>
-</div>
-                </div>
-
-                <hr class="my-4" />
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <a asp-page="./Index" class="btn btn-outline-secondary">İptal</a>
-                    <button type="submit" class="btn text-white fw-bold px-4" style="background-color: #FA6400;">
-                        Kaydet
-                    </button>
-                </div>
-            </form>
-        </div>
+        <a asp-page="./Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Listeye Dön
+        </a>
     </div>
+
+    <form method="post">
+        <div class="row g-4">
+            
+            <!-- SOL KOLON: Form Alanları (Genişlik: 7 Birim) -->
+            <div class="col-lg-7 col-md-12">
+                <div class="card shadow-sm border-0 rounded-3 mb-4">
+                    <div class="card-body p-4">
+                        <input type="hidden" asp-for="Problem.Id" />
+
+                        <!-- Problem Başlığı -->
+                        <div class="mb-3">
+                            <label asp-for="Problem.Baslik" class="form-label fw-semibold text-secondary">Problem Başlığı</label>
+                            <input asp-for="Problem.Baslik" class="form-control" placeholder="Başlık giriniz..." />
+                        </div>
+
+                        <!-- Problem Açıklaması -->
+                        <div class="mb-3">
+                            <label asp-for="Problem.Aciklama" class="form-label fw-semibold text-secondary">Problem Detayı / Açıklama</label>
+                            <textarea asp-for="Problem.Aciklama" class="form-control" rows="4" placeholder="Açıklama giriniz..."></textarea>
+                        </div>
+
+                        <!-- Durum ve Öncelik Yan Yana -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Problem.Durum" class="form-label fw-semibold text-secondary">Problem Durumu</label>
+                                <select asp-for="Problem.Durum" asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemDurumu>()" class="form-select"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Problem.Oncelik" class="form-label fw-semibold text-secondary">Öncelik Seviyesi</label>
+                                <select asp-for="Problem.Oncelik" asp-items="Html.GetEnumSelectList<ProblemTalepTakipSistemiHalkbank.Models.ProblemOncelik>()" class="form-select"></select>
+                            </div>
+                        </div>
+
+                        <!-- Atanan Personeller Listesi (İş Yükü Sayaçlı) -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold text-secondary mb-0">ATANAN PERSONELLER</label>
+                                <span class="text-muted small">Birden fazla personel seçebilirsiniz</span>
+                            </div>
+
+                            <div class="border rounded-3 p-2 bg-light shadow-inner" style="max-height: 250px; overflow-y: auto;">
+                                @for (int i = 0; i < Model.PersonelListesi.Count; i++)
+                                {
+                                    var item = Model.PersonelListesi[i];
+                                    var yukRengi = item.AktifGorevSayisi switch {
+                                        0 => "bg-success bg-opacity-10 text-success border border-success",
+                                        <= 2 => "bg-primary bg-opacity-10 text-primary border border-primary",
+                                        <= 4 => "bg-warning bg-opacity-10 text-dark border border-warning",
+                                        _ => "bg-danger bg-opacity-10 text-danger border border-danger"
+                                    };
+
+                                    <div class="form-check d-flex justify-content-between align-items-center p-2 mb-1 rounded hover-bg bg-white shadow-sm">
+                                        <div class="d-flex align-items-center">
+                                            <input class="form-check-input ms-0 me-2" type="checkbox" 
+                                                   name="SecilenPersonelIdleri" value="@item.Id" 
+                                                   id="personel_@item.Id" @(item.SeciliMi ? "checked" : "") />
+                                            <label class="form-check-label fw-medium text-dark cursor-pointer mb-0" for="personel_@item.Id">
+                                                @item.AdSoyad
+                                                <span class="text-muted small ms-1">(@item.Departman)</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Aktif İş Sayısı Rozeti -->
+                                        <span class="badge rounded-pill @yukRengi px-2 py-1 small">
+                                            <i class="bi bi-briefcase me-1"></i>@item.AktifGorevSayisi aktif iş
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top d-flex justify-content-end gap-2">
+                            <a asp-page="./Index" class="btn btn-light border px-4">Vazgeç</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-medium"
+                                    style="background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%); border: none;">
+                                <i class="bi bi-check-circle me-1"></i>Değişiklikleri Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ KOLON: Boşluğu Dolduran Özet & İpucu Paneli (Genişlik: 5 Birim) -->
+            <div class="col-lg-5 col-md-12">
+                
+                <!-- Hızlı Bilgi Kartı -->
+                <div class="card shadow-sm border-0 rounded-3 mb-3">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold text-dark">
+                            <i class="bi bi-info-circle-fill text-primary me-2"></i>Talep Özeti & Konum
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">Kayıt Numarası:</span>
+                                <span class="fw-bold">#@Model.Problem.Id</span>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">Bölge / Şube:</span>
+                                <span class="fw-semibold">Çanakkale / Gökçeada</span>
+                            </li>
+                            <li class="list-group-item px-0 d-flex justify-content-between">
+                                <span class="text-muted">Kayıt Zamanı:</span>
+                                <span>14.09.2026 11:50</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Admin İş Atama Rehberi -->
+                <div class="card shadow-sm border-0 rounded-3 bg-light">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold text-secondary mb-2">
+                            <i class="bi bi-lightning-charge-fill text-warning me-1"></i>İş Dağıtım Rehberi
+                        </h6>
+                        <p class="small text-muted mb-2">
+                            Personellerin yanında görünen sayaçlar, şu an aktif olarak üzerlerinde açık olan çözülmemiş görev sayısını gösterir:
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 small">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success">0 Görev: Boşta</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary">1-2 Görev: Normal</span>
+                            <span class="badge bg-warning bg-opacity-10 text-dark border border-warning">3-4 Görev: Yoğun</span>
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">5+ Görev: Aşırı Yüklü</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </form>
 </div>
