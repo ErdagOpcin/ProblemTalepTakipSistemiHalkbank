@@ -1,4 +1,4 @@
-@page "{id:int}"
+@page 
 @model ProblemTalepTakipSistemiHalkbank.Pages.Problemler.DetayModel
 @{
     ViewData["Title"] = $"Problem Detayı #{Model.Problem.Id}";
@@ -109,12 +109,13 @@
                                             @(pp.Personel.AdSoyad.Length > 0 ? pp.Personel.AdSoyad.Substring(0, 1).ToUpper() : "P")
                                         </div>
                                         <div>
-                                            @if (User.IsInRole("Admin"))
-                                            {
-                                            <a asp-page="/Personeller/Detay" asp-route-id="@pp.PersonelId" class="fw-bold text-dark text-decoration-none">
-                                                @pp.Personel.AdSoyad
+                                            <!-- Takım arkadaşına tıklandığında basic modal açılır -->
+                                            <a href="javascript:void(0);" 
+                                            class="fw-bold text-dark text-decoration-none"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#personelModal_@pp.PersonelId">
+                                                @pp.Personel.AdSoyad <i class="bi bi-info-circle text-primary ms-1" style="font-size: 0.85rem;"></i>
                                             </a>
-                                            }
                                             <div class="small text-muted">
                                                 <i class="bi bi-building me-1"></i>@pp.Personel.Departman
                                                 <span class="mx-1">&bull;</span>
@@ -122,12 +123,50 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                    <a asp-page="/Personeller/Detay" asp-route-id="@pp.PersonelId" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-person-lines-fill me-1"></i>Profile Git
-                                    </a>
-                                    }
+
+                                    <div class="d-flex gap-2">
+                                        <!-- Personel için Temel Bilgi Butonu -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#personelModal_@pp.PersonelId">
+                                            <i class="bi bi-card-text me-1"></i>Bilgi
+                                        </button>
+
+                                        <!-- Sadece Admin için Tam Yönetim/Profil Butonu -->
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-page="/Personeller/Detay" asp-route-id="@pp.PersonelId" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-person-gear me-1"></i>Detaylı Bilgi
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Takım Arkadaşı Basic İletişim Modalı -->
+                                <div class="modal fade" id="personelModal_@pp.PersonelId" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                                        <div class="modal-content border-0 shadow">
+                                            <div class="modal-header border-bottom-0 pb-0">
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                            </div>
+                                            <div class="modal-body text-center pt-0 pb-4 px-4">
+                                                <div class="avatar-circle bg-primary bg-opacity-10 text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.4rem;">
+                                                    @(pp.Personel.AdSoyad.Length > 0 ? pp.Personel.AdSoyad.Substring(0, 1).ToUpper() : "P")
+                                                </div>
+                                                <h5 class="fw-bold mb-1">@pp.Personel.AdSoyad</h5>
+                                                <span class="badge bg-light text-primary border mb-3">@pp.Personel.Departman</span>
+                                                
+                                                <div class="text-start bg-light p-3 rounded-3 small">
+                                                    <div class="mb-2">
+                                                        <span class="text-muted d-block small">E-posta:</span>
+                                                        <a href="mailto:@pp.Personel.Email" class="text-decoration-none fw-medium text-dark">
+                                                            <i class="bi bi-envelope me-1 text-primary"></i>@pp.Personel.Email
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             }
                         </div>
@@ -140,7 +179,6 @@
                     }
                 </div>
             </div>
-
         </div>
 
         <!-- SAĞ KOLON: Durum Paneli & Künye (Genişlik: 5 Birim) -->

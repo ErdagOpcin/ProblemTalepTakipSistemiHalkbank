@@ -32,82 +32,53 @@
         <aside class="sidebar">
 
             <div class="sidebar-brand">
-
                 <img src="~/images/halkbank-logo.jpeg"
                      asp-append-version="true"
                      alt="Halkbank"
                      class="halkbank-logo" />
-
             </div>
 
             <nav class="sidebar-menu">
 
                 <a asp-page="/Index"
                    class="sidebar-link">
-
-                    <span class="sidebar-icon">
-                        ⌂
-                    </span>
-
-                    <span>
-                        Ana Sayfa
-                    </span>
-
+                    <span class="sidebar-icon">⌂</span>
+                    <span>Ana Sayfa</span>
                 </a>
 
-                <a asp-page="/Personeller/Index"
-                   class="sidebar-link">
-
-                    <span class="sidebar-icon">
-                        👥
-                    </span>
-
-                    <span>
-                        Personeller
-                    </span>
-
-                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-page="/Personeller/Index"
+                       class="sidebar-link">
+                        <span class="sidebar-icon">👥</span>
+                        <span>Personeller</span>
+                    </a>
+                }
 
                 <a asp-page="/Problemler/Index"
                    class="sidebar-link">
-
-                    <span class="sidebar-icon">
-                        ⚠
-                    </span>
-
-                    <span>
-                        Problemler
-                    </span>
-
+                    <span class="sidebar-icon">⚠</span>
+                    <span>Problemler</span>
                 </a>
 
                 <a asp-page="/Bildirimler/Tumu" class="sidebar-link">
-                    <span class="sidebar-icon">
-                        🔔
-                    </span>
-                    <span>
-                        Bildirimler
-                    </span>
+                    <span class="sidebar-icon">🔔</span>
+                    <span>Bildirimler</span>
                 </a>
 
             </nav>
 
             <div class="sidebar-bottom">
-
                 <div class="sidebar-line"></div>
-
                 <div class="sidebar-bottom-title">
                     Problem Talep Takip Sistemi
                 </div>
-
                 <div class="sidebar-slogan">
                     Üreten Türkiye'nin Bankası
                 </div>
-
             </div>
 
         </aside>
-
 
         <!-- SAĞ ANA ALAN -->
         <div class="main-area">
@@ -141,23 +112,23 @@
                                 </span>
                             </button>
 
-                            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 mt-2" 
-                                aria-labelledby="bildirimDropdown" 
-                                style="width: 320px; border-radius: 12px; z-index: 1050;">
-                                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light" style="border-radius: 12px 12px 0 0;">
-                                    <span class="fw-bold small mb-0">Bildirimler</span>
-                                    <button class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-bold" id="btnTumunuOku" style="font-size: 11px;">
-                                        Tümünü Oku
+                            <!-- AÇILIR BİLDİRİM KUTUSU -->
+                            <div class="dropdown-menu dropdown-menu-end shadow-sm border-0 p-0" style="width: 320px; max-height: 420px; overflow-y: auto;">
+                                <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                                    <span class="fw-bold text-dark small mb-0">Bildirimler</span>
+                                    <a asp-page="/Bildirimler/Tumu" class="text-primary text-decoration-none small" style="font-size: 0.8rem;">Tümünü Gör</a>
+                                </div>
+
+                                <!-- AJAX ile doldurulan bildirim listesi -->
+                                <div id="bildirimListesi" class="list-group list-group-flush">
+                                    <div class="text-center text-muted small py-4">Yükleniyor...</div>
+                                </div>
+
+                                <!-- EN ALTTTAKİ TÜMÜNÜ OKU BUTONU -->
+                                <div class="p-2 border-top bg-light text-center">
+                                    <button type="button" id="btnTumunuOku" class="btn btn-sm btn-link text-primary text-decoration-none fw-semibold p-1" style="font-size: 0.82rem;">
+                                        <i class="bi bi-check2-all me-1"></i>Tümünü Okundu Olarak İşaretle
                                     </button>
-                                </div>
-                                <div id="bildirimListesi" style="max-height: 350px; overflow-y: auto;">
-                                    <div class="text-center text-muted small py-3">Yükleniyor...</div>
-                                </div>
-                                <!-- Dropdown'ın içindeki listenin altına -->
-                                <div class="p-2 border-top text-center bg-light" style="border-radius: 0 0 12px 12px;">
-                                    <a asp-page="/Bildirimler/Tumu" class="text-decoration-none small fw-bold text-primary">
-                                        Tüm Bildirimleri Gör &rarr;
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -172,30 +143,21 @@
 
             </header>
 
-
             <!-- SAYFA İÇERİĞİ -->
             <main class="content-area">
-
                 <div class="page-card">
-
                     @RenderBody()
-
                 </div>
-
             </main>
-
 
             <!-- FOOTER -->
             <footer class="app-footer">
-
                 <span>
                     &copy; 2026 Halkbank - Problem Talep Takip Sistemi
                 </span>
-
                 <span>
                     Üreten Türkiye'nin Bankası
                 </span>
-
             </footer>
 
         </div>
@@ -208,72 +170,89 @@
     </form>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @if (User.Identity?.IsAuthenticated == true)
     {
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                yukleBildirimler();
+            yukleBildirimler();
 
-                // Tümünü Okundu İşaretle butonu
-                document.getElementById("btnTumunuOku")?.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    const token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]')?.value || '';
+            // En alttaki "Tümünü Okundu Olarak İşaretle" butonu
+            document.getElementById("btnTumunuOku")?.addEventListener("click", function (e) {
+                e.preventDefault();
+                const token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]')?.value || '';
 
-                    fetch('/Bildirimler?handler=TumunuOku', {
-                        method: 'POST',
-                        headers: {
-                            'RequestVerificationToken': token
-                        }
-                    }).then(() => {
-                        yukleBildirimler();
-                    });
+                fetch('/Bildirimler?handler=TumunuOku', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    }
+                }).then(() => {
+                    yukleBildirimler();
                 });
             });
+        });
 
-            function yukleBildirimler() {
-                fetch('/Bildirimler?handler=Bildirimler')
-                    .then(res => res.json())
-                    .then(data => {
-                        const badge = document.getElementById("bildirimSayisi");
-                        const liste = document.getElementById("bildirimListesi");
+        function yukleBildirimler() {
+            fetch('/Bildirimler?handler=Bildirimler')
+                .then(res => res.json())
+                .then(data => {
+                    const badge = document.getElementById("bildirimSayisi");
+                    const liste = document.getElementById("bildirimListesi");
 
-                        if (!badge || !liste) return;
+                    if (!badge || !liste) return;
 
-                        if (data.sayi > 0) {
-                            badge.textContent = data.sayi;
-                            badge.classList.remove("d-none");
-                        } else {
-                            badge.classList.add("d-none");
-                        }
+                    if (data.sayi > 0) {
+                        badge.textContent = data.sayi;
+                        badge.classList.remove("d-none");
+                    } else {
+                        badge.classList.add("d-none");
+                    }
 
-                        liste.innerHTML = "";
+                    liste.innerHTML = "";
 
-                        if (!data.bildirimler || data.bildirimler.length === 0) {
-                            liste.innerHTML = '<div class="text-center text-muted small py-4">Yeni bildiriminiz bulunmuyor.</div>';
-                            return;
-                        }
+                    if (!data.bildirimler || data.bildirimler.length === 0) {
+                        liste.innerHTML = '<div class="text-center text-muted small py-4">Yeni bildiriminiz bulunmuyor.</div>';
+                        return;
+                    }
 
-                        data.bildirimler.forEach(b => {
-                            const item = document.createElement("a");
-                            item.href = `/Problemler/Detay?id=${b.problemId}`;
-                            item.className = "dropdown-item p-2 border-bottom text-wrap";
-                            item.style.whiteSpace = "normal";
-                            item.innerHTML = `
+                    data.bildirimler.forEach(b => {
+                        const item = document.createElement("a");
+                        // Tıklandığında önce okundu yapar sonra sayfaya yönlendirir:
+                        item.href = "javascript:void(0);";
+                        item.onclick = function () { bildirimTiklandi(b.id, b.problemId); };
+                        item.className = "dropdown-item p-2 border-bottom text-wrap " + (!b.okunduMu ? "bg-light" : "");
+                        item.style.whiteSpace = "normal";
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
                                 <div class="fw-bold small text-primary">${b.baslik}</div>
-                                <div class="text-secondary small" style="font-size: 12px;">${b.mesaj}</div>
-                                <div class="text-muted mt-1" style="font-size: 10px;">${b.tarih}</div>
-                            `;
-                            liste.appendChild(item);
-                        });
-                    })
-                    .catch(err => console.error("Bildirimler alınamadı:", err));
-            }
+                                ${!b.okunduMu ? '<span class="badge rounded-pill bg-danger" style="width: 7px; height: 7px; padding: 0;" title="Okunmadı"></span>' : ''}
+                            </div>
+                            <div class="text-secondary small" style="font-size: 12px;">${b.mesaj}</div>
+                            <div class="text-muted mt-1" style="font-size: 10px;">${b.tarih}</div>
+                        `;
+                        liste.appendChild(item);
+                    });
+                })
+                .catch(err => console.error("Bildirimler alınamadı:", err));
+        }
+
+        // Tıklanan bildirimi okundu yapıp probleme yönlendiren fonksiyon:
+        function bildirimTiklandi(bildirimId, problemId) {
+            const token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]')?.value || '';
+            
+            fetch(`/Bildirimler?handler=OkunduYap&id=${bildirimId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            }).finally(() => {
+                // İster Details ister Detay hangisini kullanıyorsan o URL'e yönlendir:
+                window.location.href = `/Problemler/Detay?id=${problemId}`;
+            });
+        }
         </script>
     }
 

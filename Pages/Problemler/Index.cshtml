@@ -53,6 +53,8 @@
                     </div>
 
                     <!-- Atanan Personel Filtresi -->
+                    @if(User.IsInRole("Admin"))
+                    {
                     <div class="col-md-3">
                         <label asp-for="SecilenPersonelId" class="form-label fw-bold small text-muted text-uppercase mb-1">
                             Atanan Personel
@@ -64,7 +66,8 @@
                             <option value="">-- Tüm Personeller --</option>
                         </select>
                     </div>
-
+                    }
+                    
                     <!-- Filtreleri Temizle Butonu (Her zaman görünür ve tabana hizalı) -->
                     <div class="col-md-3">
                         <label class="form-label d-none d-md-block small mb-1" style="visibility: hidden;">Boşluk</label>
@@ -95,11 +98,7 @@
                         <th>Durum</th>
                         <th>Çözülme Tarihi</th>
                         <th>Atanan Personel</th>
-
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <th>İşlemler</th>
-                        }
+                        <th>İşlemler</th>
                     </tr>
 
                 </thead>

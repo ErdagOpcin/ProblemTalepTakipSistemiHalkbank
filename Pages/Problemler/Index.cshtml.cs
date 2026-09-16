@@ -36,6 +36,9 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
         public List<SelectListItem> PersonelListesi { get; set; } = new();
         public async Task OnGetAsync()
         {
+        // 1. Sadece Admin rolü personelleri filtreleyebilir
+        if (User.IsInRole("Admin"))
+        {
             var personeller = await _context.Personeller
                 .OrderBy(p => p.AdSoyad)
                 .Select(p => new SelectListItem
@@ -44,58 +47,58 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                     Text = p.AdSoyad
                 })
                 .ToListAsync();
+
             personeller.Insert(0, new SelectListItem
             {
                 Value = "-1",
                 Text = "⚠️ Atanmadı"
             });
+
             PersonelListesi = personeller;
-            // Problem ve atanmış tüm personellerin bilgisini birlikte getir.
-            IQueryable<Problem> query = _context.Problemler
-                .Include(p => p.ProblemPersoneller)
-                    .ThenInclude(pp => pp.Personel);
+        }
 
-            // Admin olmayan kullanıcı yalnızca
-            // kendisine atanmış problemleri görebilir.
-            if (!User.IsInRole("Admin"))
+        // 2. Problem ve atanmış tüm personellerin bilgisini birlikte getir
+        IQueryable<Problem> query = _context.Problemler
+            .Include(p => p.ProblemPersoneller)
+                .ThenInclude(pp => pp.Personel);
+
+        // 3. Admin olmayan kullanıcı yalnızca kendisine atanmış problemleri görür
+        if (!User.IsInRole("Admin"))
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            query = query.Where(p =>
+                p.ProblemPersoneller.Any(pp => pp.Personel.IdentityUserId == currentUserId));
+        }
+
+        // 4. Durum ve Öncelik filtreleri (Herkes için geçerli)
+        if (DurumFiltre.HasValue)
+        {
+            query = query.Where(p => p.Durum == DurumFiltre.Value);
+        }
+
+        if (SecilenOncelik.HasValue)
+        {
+            query = query.Where(p => p.Oncelik == SecilenOncelik.Value);
+        }
+
+        // 5. Seçilen Personel Filtresi (Yalnızca Admin ise uygulanır)
+        if (User.IsInRole("Admin") && SecilenPersonelId.HasValue)
+        {
+            if (SecilenPersonelId.Value == -1)
             {
-                var currentUserId = _userManager.GetUserId(User);
-
-                query = query.Where(p =>
-                    p.ProblemPersoneller.Any(pp => pp.Personel.IdentityUserId == currentUserId));
+                query = query.Where(p => !p.ProblemPersoneller.Any());
             }
-
-            // Kullanıcı bir durum seçtiyse
-            // yalnızca o durumdaki problemleri getir.
-            if (DurumFiltre.HasValue)
+            else
             {
-                query = query.Where(p =>
-                    p.Durum == DurumFiltre.Value);
+                query = query.Where(p => p.ProblemPersoneller.Any(pp => pp.PersonelId == SecilenPersonelId.Value));
             }
-            if(SecilenOncelik.HasValue)
-            {
-                query = query.Where(p=>p.Oncelik == SecilenOncelik.Value);
-            }
+        }
 
-            // SEÇİLEN PERSONEL FİLTRESİ
-            if (SecilenPersonelId.HasValue)
-            {
-                if (SecilenPersonelId.Value == -1)
-                {
-                    // Atanmadı seçildiyse: ProblemPersoneller listesi boş olanları getir
-                    query = query.Where(p => !p.ProblemPersoneller.Any());
-                }
-                else
-                {
-                    // Normal personel seçildiyse: O personelin ID'sini ara
-                    query = query.Where(p => p.ProblemPersoneller.Any(pp => pp.PersonelId == SecilenPersonelId.Value));
-                }
-            }
-
-            // En yeni problemler üstte gösterilir.
-            Problemler = await query
-                .OrderByDescending(p => p.OlusturulmaTarihi)
-                .ToListAsync();
+        // 6. En yeni problemler üstte gösterilir
+        Problemler = await query
+            .OrderByDescending(p => p.OlusturulmaTarihi)
+            .ToListAsync();
         }
     }
 }

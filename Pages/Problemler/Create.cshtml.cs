@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,13 +18,16 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
     {
         private readonly ApplicationDbContext _context;
         private readonly CityApiService _cityApiService;
+        private readonly IBildirimServisi _bildirimServisi;
 
         public CreateModel(
             ApplicationDbContext context,
-            CityApiService cityApiService)
+            CityApiService cityApiService,
+            IBildirimServisi bildirimServisi)
         {
             _context = context;
             _cityApiService = cityApiService;
+            _bildirimServisi = bildirimServisi;
         }
 
         [BindProperty]
@@ -35,7 +42,9 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
 
         public List<SelectListItem> SehirlerListesi { get; set; } = new();
         public List<SelectListItem> IlcelerListesi { get; set; } = new();
-        public List<SelectListItem> PersonelListesi { get; set; } = new();
+        
+        // İş yükü rozetlerini ve departmanı taşıyan DTO listesi:
+        public List<PersonelSecimDto> PersonelListesi { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -84,8 +93,8 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
             Problem.OlusturulmaTarihi = DateTime.Now;
             Problem.Durum = ProblemDurumu.Bekliyor;
 
-            // Seçilen personelleri ara tabloya bağla
-            if (SecilenPersonelIds.Any())
+            // Seçilen personelleri ara tablo koleksiyonuna ekle
+            if (SecilenPersonelIds != null && SecilenPersonelIds.Any())
             {
                 foreach (var personelId in SecilenPersonelIds)
                 {
@@ -96,8 +105,19 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                 }
             }
 
+            // 1. Önce veritabanına kaydet ki Problem.Id Identity olarak atansın
             _context.Problemler.Add(Problem);
             await _context.SaveChangesAsync();
+
+            // 2. Artık Problem.Id dolu (örn: 15). Şimdi bildirim ve e-postayı güvenle atabiliriz
+            if (SecilenPersonelIds != null && SecilenPersonelIds.Any())
+            {
+                await _bildirimServisi.TopluBildirimGonderAsync(
+                    SecilenPersonelIds,
+                    Problem.Id,
+                    "Yeni Görev Atandı",
+                    $"'{Problem.Baslik}' başlıklı yeni bir talep size atandı.");
+            }
 
             return RedirectToPage("./Index");
         }
@@ -127,17 +147,19 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
                     .ToList();
             }
 
-            var personeller = await _context.Personeller
-                .OrderBy(p => p.AdSoyad)
-                .ToListAsync();
-
-            PersonelListesi = personeller
-                .Select(p => new SelectListItem
+            // Personelleri ve üzerlerindeki aktif görev sayılarını hesaplayıp azdan çoğa sıralıyoruz:
+            PersonelListesi = await _context.Personeller
+                .Select(p => new PersonelSecimDto
                 {
-                    Text = $"{p.AdSoyad} - {p.Departman}",
-                    Value = p.Id.ToString()
+                    Id = p.Id,
+                    AdSoyad = p.AdSoyad,
+                    Departman = p.Departman,
+                    AktifGorevSayisi = p.ProblemPersoneller.Count(pp =>
+                        pp.Problem.Durum != ProblemDurumu.Cozuldu),
+                    SeciliMi = false
                 })
-                .ToList();
+                .OrderBy(p => p.AktifGorevSayisi)
+                .ToListAsync();
         }
     }
 }

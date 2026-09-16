@@ -60,131 +60,154 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Problemler
         }
 
         public async Task<IActionResult> OnPostAsync()
+{
+        var mevcutProblem = await _context.Problemler
+            .Include(p => p.ProblemPersoneller)
+            .FirstOrDefaultAsync(p => p.Id == Problem.Id);
+
+        if (mevcutProblem == null)
         {
-            var mevcutProblem = await _context.Problemler
-                .Include(p => p.ProblemPersoneller)
-                .FirstOrDefaultAsync(p => p.Id == Problem.Id);
+            return NotFound();
+        }
 
-            if (mevcutProblem == null)
+        // 1. ESKİ DEĞERLERİ DEĞİŞİKLİKTEN ÖNCE SAKLA
+        var eskiBaslik = mevcutProblem.Baslik;
+        var eskiAciklama = mevcutProblem.Aciklama;
+        var eskiDurum = mevcutProblem.Durum;
+        var eskiOncelik = mevcutProblem.Oncelik;
+        var eskiPersonelIdler = mevcutProblem.ProblemPersoneller
+            .Select(pp => pp.PersonelId)
+            .ToList();
+
+        var yeniPersonelIdler = SecilenPersonelIdleri ?? new List<int>();
+
+        // 2. FARK ANALİZİ (Personel Atamaları ve İçerik)
+        var eklenenPersoneller = yeniPersonelIdler.Except(eskiPersonelIdler).ToList();
+        var cikarilanPersoneller = eskiPersonelIdler.Except(yeniPersonelIdler).ToList();
+        var gorevdeKalanlar = eskiPersonelIdler.Intersect(yeniPersonelIdler).ToList();
+
+        bool baslikDegisti = !string.IsNullOrWhiteSpace(Problem.Baslik) && Problem.Baslik.Trim() != (eskiBaslik ?? "").Trim();
+        bool aciklamaDegisti = (Problem.Aciklama ?? "").Trim() != (eskiAciklama ?? "").Trim();
+
+        // 3. MODELİ GÜNCELLE
+        mevcutProblem.Durum = Problem.Durum;
+        mevcutProblem.Oncelik = Problem.Oncelik;
+        mevcutProblem.Aciklama = Problem.Aciklama;
+
+        if (!string.IsNullOrWhiteSpace(Problem.Baslik))
+        {
+            mevcutProblem.Baslik = Problem.Baslik;
+        }
+
+        if (Problem.Durum == ProblemDurumu.Cozuldu)
+        {
+            if (mevcutProblem.CozulmeTarihi == null)
             {
-                return NotFound();
+                mevcutProblem.CozulmeTarihi = DateTime.Now;
             }
+        }
+        else
+        {
+            mevcutProblem.CozulmeTarihi = null;
+        }
 
-            // 1. ESKİ DEĞERLERİ DEĞİŞİKLİKTEN ÖNCE SAKLA
-            var eskiDurum = mevcutProblem.Durum;
-            var eskiOncelik = mevcutProblem.Oncelik;
-            var eskiPersonelIdler = mevcutProblem.ProblemPersoneller
-                .Select(pp => pp.PersonelId)
-                .ToList();
-
-            var yeniPersonelIdler = SecilenPersonelIdleri ?? new List<int>();
-
-            // 2. FARK ANALİZİ (Personel Atamaları)
-            var eklenenPersoneller = yeniPersonelIdler.Except(eskiPersonelIdler).ToList();
-            var cikarilanPersoneller = eskiPersonelIdler.Except(yeniPersonelIdler).ToList();
-            var gorevdeKalanlar = eskiPersonelIdler.Intersect(yeniPersonelIdler).ToList();
-
-            // 3. MODELİ GÜNCELLE
-            mevcutProblem.Durum = Problem.Durum;
-            mevcutProblem.Oncelik = Problem.Oncelik;
-            mevcutProblem.Aciklama = Problem.Aciklama;
-
-            if (!string.IsNullOrWhiteSpace(Problem.Baslik))
+        // Personel listesini senkronize et
+        mevcutProblem.ProblemPersoneller.Clear();
+        foreach (var personelId in yeniPersonelIdler)
+        {
+            mevcutProblem.ProblemPersoneller.Add(new ProblemPersonel
             {
-                mevcutProblem.Baslik = Problem.Baslik;
-            }
+                ProblemId = mevcutProblem.Id,
+                PersonelId = personelId
+            });
+        }
 
-            if (Problem.Durum == ProblemDurumu.Cozuldu)
-            {
-                if (mevcutProblem.CozulmeTarihi == null)
-                {
-                    mevcutProblem.CozulmeTarihi = DateTime.Now;
-                }
-            }
-            else
-            {
-                mevcutProblem.CozulmeTarihi = null;
-            }
+        // Veritabanına kaydet
+        await _context.SaveChangesAsync();
 
-            // Personel listesini senkronize et
-            mevcutProblem.ProblemPersoneller.Clear();
-            foreach (var personelId in yeniPersonelIdler)
-            {
-                mevcutProblem.ProblemPersoneller.Add(new ProblemPersonel
-                {
-                    ProblemId = mevcutProblem.Id,
-                    PersonelId = personelId
-                });
-            }
+        // 4. BİLDİRİM SENARYOLARI
 
-            // Veritabanına kaydet
-            await _context.SaveChangesAsync();
+        // Senaryo 1: Göreve yeni atanan kişiye bildirim
+        foreach (var personelId in eklenenPersoneller)
+        {
+            await _bildirimServisi.BildirimGonderAsync(
+                personelId,
+                mevcutProblem.Id,
+                "Yeni Task Atandı",
+                $"'{mevcutProblem.Baslik}' başlıklı görev size atandı.");
+        }
 
-            // 4. BİLDİRİM SENARYOLARI
+        // Senaryo 2: Taskta kalan mevcut kişilere "yeni kişi eklendi" bildirimi
+        if (eklenenPersoneller.Any() && gorevdeKalanlar.Any())
+        {
+            await _bildirimServisi.TopluBildirimGonderAsync(
+                gorevdeKalanlar,
+                mevcutProblem.Id,
+                "Göreve Personel Eklendi",
+                $"'{mevcutProblem.Baslik}' görevine yeni bir ekip arkadaşı dahil edildi.");
+        }
 
-            // Senaryo 1: Göreve yeni atanan kişiye bildirim
-            foreach (var personelId in eklenenPersoneller)
-            {
-                await _bildirimServisi.BildirimGonderAsync(
-                    personelId,
-                    mevcutProblem.Id,
-                    "Yeni Task Atandı",
-                    $"'{mevcutProblem.Baslik}' başlıklı görev size atandı.");
-            }
+        // Senaryo 3: Görevden çıkarılan kişiye bildirim
+        foreach (var personelId in cikarilanPersoneller)
+        {
+            await _bildirimServisi.BildirimGonderAsync(
+                personelId,
+                mevcutProblem.Id,
+                "Görevden Alındınız",
+                $"'{mevcutProblem.Baslik}' başlıklı görevdeki atamanız kaldırıldı.");
+        }
 
-            // Senaryo 2: Taskta kalan mevcut kişilere "yeni kişi eklendi" bildirimi
-            if (eklenenPersoneller.Any() && gorevdeKalanlar.Any())
-            {
-                await _bildirimServisi.TopluBildirimGonderAsync(
-                    gorevdeKalanlar,
-                    mevcutProblem.Id,
-                    "Göreve Personel Eklendi",
-                    $"'{mevcutProblem.Baslik}' görevine yeni bir ekip arkadaşı dahil edildi.");
-            }
+        // Senaryo 4: Öncelik değiştiğinde (Görevde güncel bulunan tüm personellere)
+        if (eskiOncelik != mevcutProblem.Oncelik && yeniPersonelIdler.Any())
+        {
+            await _bildirimServisi.TopluBildirimGonderAsync(
+                yeniPersonelIdler,
+                mevcutProblem.Id,
+                "Öncelik Değişti",
+                $"'{mevcutProblem.Baslik}' görevinin önceliği '{mevcutProblem.Oncelik}' olarak güncellendi.");
+        }
 
-            // Senaryo 3: Görevden çıkarılan kişiye bildirim
-            foreach (var personelId in cikarilanPersoneller)
-            {
-                await _bildirimServisi.BildirimGonderAsync(
-                    personelId,
-                    mevcutProblem.Id,
-                    "Görevden Alındınız",
-                    $"'{mevcutProblem.Baslik}' başlıklı görevdeki atamanız kaldırıldı.");
-            }
-
-            // Senaryo 4: Öncelik değiştiğinde (Görevde güncel bulunan tüm personellere)
-            if (eskiOncelik != mevcutProblem.Oncelik && yeniPersonelIdler.Any())
+        // Senaryo 5: Durum değiştiğinde veya işlem bittiğinde
+        if (eskiDurum != mevcutProblem.Durum && yeniPersonelIdler.Any())
+        {
+            if (mevcutProblem.Durum == ProblemDurumu.Cozuldu)
             {
                 await _bildirimServisi.TopluBildirimGonderAsync(
                     yeniPersonelIdler,
                     mevcutProblem.Id,
-                    "Öncelik Değişti",
-                    $"'{mevcutProblem.Baslik}' görevinin önceliği '{mevcutProblem.Oncelik}' olarak güncellendi.");
+                    "Task Tamamlandı",
+                    $"'{mevcutProblem.Baslik}' görevi çözüldü olarak işaretlendi.");
             }
-
-            // Senaryo 5: Durum değiştiğinde veya işlem bittiğinde
-            if (eskiDurum != mevcutProblem.Durum && yeniPersonelIdler.Any())
+            else
             {
-                if (mevcutProblem.Durum == ProblemDurumu.Cozuldu)
-                {
-                    await _bildirimServisi.TopluBildirimGonderAsync(
-                        yeniPersonelIdler,
-                        mevcutProblem.Id,
-                        "Task Tamamlandı",
-                        $"'{mevcutProblem.Baslik}' görevi çözüldü olarak işaretlendi.");
-                }
-                else
-                {
-                    await _bildirimServisi.TopluBildirimGonderAsync(
-                        yeniPersonelIdler,
-                        mevcutProblem.Id,
-                        "Durum Güncellendi",
-                        $"'{mevcutProblem.Baslik}' görevinin durumu '{mevcutProblem.Durum}' olarak güncellendi.");
-                }
+                await _bildirimServisi.TopluBildirimGonderAsync(
+                    yeniPersonelIdler,
+                    mevcutProblem.Id,
+                    "Durum Güncellendi",
+                    $"'{mevcutProblem.Baslik}' görevinin durumu '{mevcutProblem.Durum}' olarak güncellendi.");
             }
-
-            return RedirectToPage("./Index");
         }
+
+        // Senaryo 6: Başlık veya Açıklama değiştiğinde (Görevdeki güncel tüm personellere)
+        if ((baslikDegisti || aciklamaDegisti) && yeniPersonelIdler.Any())
+        {
+            string detayMesaji;
+            if (baslikDegisti && aciklamaDegisti)
+                detayMesaji = "görevinin başlığı ve açıklama detayı güncellendi.";
+            else if (baslikDegisti)
+                detayMesaji = $"görevinin başlığı güncellendi (Yeni Başlık: '{mevcutProblem.Baslik}').";
+            else
+                detayMesaji = "görevinin açıklama detayı güncellendi.";
+
+            await _bildirimServisi.TopluBildirimGonderAsync(
+                yeniPersonelIdler,
+                mevcutProblem.Id,
+                "Görev Detayları Güncellendi",
+                $"'{mevcutProblem.Baslik}' {detayMesaji}");
+        }
+
+        return RedirectToPage("./Index");
+    }
 
         private async Task PersonelListesiniYukleAsync(int problemId)
         {

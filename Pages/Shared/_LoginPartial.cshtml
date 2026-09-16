@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Identity
 @using ProblemTalepTakipSistemiHalkbank.Data
+@using ProblemTalepTakipSistemiHalkbank.Models
 @using System.Linq
 
 @inject SignInManager<IdentityUser> SignInManager
@@ -10,10 +11,17 @@
 @if (SignInManager.IsSignedIn(User))
 {
     var userId = UserManager.GetUserId(User);
-    var personel = Context.Personeller.FirstOrDefault(p => p.IdentityUserId == userId);
+    var userEmail = (UserManager.GetUserName(User) ?? User.Identity?.Name ?? "").Trim().ToLower();
+
+    // 1. Önce IdentityUserId ile ara, bulamazsa Email ile ara
+    var personel = Context.Personeller.FirstOrDefault(p => 
+        (!string.IsNullOrEmpty(p.IdentityUserId) && p.IdentityUserId == userId) ||
+        (!string.IsNullOrEmpty(p.Email) && p.Email.ToLower() == userEmail)
+    );
+
     var gorunenIsim = (personel != null && !string.IsNullOrWhiteSpace(personel.AdSoyad))
                         ? personel.AdSoyad
-                        : (User.Identity?.Name ?? "Kullanıcı");
+                        : (!string.IsNullOrEmpty(userEmail) ? userEmail : "Kullanıcı");
 
     <li class="nav-item">
         <div class="d-flex flex-column text-end justify-content-center" style="gap: 1px;">

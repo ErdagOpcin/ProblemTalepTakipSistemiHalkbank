@@ -70,5 +70,17 @@ namespace ProblemTalepTakipSistemiHalkbank.Pages.Bildirimler
 
             return new JsonResult(new { success = true });
         }
+
+        public async Task<IActionResult> OnPostOkunduYapAsync(int id)
+        {
+            var bildirim = await _context.Bildirimler.FindAsync(id);
+            if (bildirim != null)
+            {
+                bildirim.OkunduMu = true;
+                await _context.SaveChangesAsync();
+            }
+            return new JsonResult(new { success = true });
+        }
+
     }
 }
