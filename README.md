@@ -293,7 +293,7 @@ This project provided hands-on experience with:
 Developed collaboratively as part of a software development project.
 
 **Erdağ Öpçin**
-
+**Gökdeniz Ayberk Türkmen**
 Primary contributions include authentication and authorization infrastructure, ASP.NET Core Identity integration, role management, security features, application integration and UI development.
 
 ---
